@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <RootNamespace>Utubz</RootNamespace>
+    <AssemblyName>Utubz</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Native\**" />
+    <EmbeddedResource Remove="Native\**" />
+    <None Remove="Native\**" />
+  </ItemGroup>
+
+</Project>
