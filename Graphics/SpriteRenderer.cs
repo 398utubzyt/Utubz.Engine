@@ -22,12 +22,14 @@ namespace Utubz.Graphics
             public uint posattr;
             public uint colattr;
             public uint texattr;
-            public uint prjunif;
-            public uint viwunif;
-            public uint modunif;
-            public float* model;
-            public float* view;
-            public float* projection;
+            //public uint prjunif;
+            //public uint viwunif;
+            //public uint modunif;
+            public uint mvpunif;
+            //public float* model;
+            //public float* view;
+            //public float* projection;
+            public float* mvp;
 
             public void SetData(int index, float value)
             {
@@ -42,7 +44,7 @@ namespace Utubz.Graphics
             {
                 glad.GLGenBuffers(1, vbo);
                 glad.GLBindBuffer(glad.GL_ARRAY_BUFFER, *vbo);
-                glad.GLBufferData(glad.GL_ARRAY_BUFFER, 20 * sizeof(float), (IntPtr)data, glad.GL_DYNAMIC_DRAW);
+                glad.GLBufferData(glad.GL_ARRAY_BUFFER, 24 * sizeof(float), (IntPtr)data, glad.GL_DYNAMIC_DRAW);
 
                 glad.GLGenVertexArrays(1, vao);
                 glad.GLBindVertexArray(*vao);
@@ -55,20 +57,21 @@ namespace Utubz.Graphics
             public void InitAttr(Shader shader)
             {
                 posattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexPositionAttribute);
-                glad.GLVertexAttribPointer(posattr, 2, glad.GL_FLOAT, glad.GL_FALSE, 2 * sizeof(float), (IntPtr)0);
+                glad.GLVertexAttribPointer(posattr, 3, glad.GL_FLOAT, glad.GL_FALSE, 3 * sizeof(float), (IntPtr)0);
                 glad.GLEnableVertexAttribArray(posattr);
 
                 colattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexColorAttribute);
-                glad.GLVertexAttribPointer(colattr, 4, glad.GL_FLOAT, glad.GL_FALSE, 0, (IntPtr)(8 * sizeof(float)));
+                glad.GLVertexAttribPointer(colattr, 4, glad.GL_FLOAT, glad.GL_FALSE, 0, (IntPtr)(12 * sizeof(float)));
                 glad.GLEnableVertexAttribArray(colattr);
 
                 texattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexTexCoordAttribute);
-                glad.GLVertexAttribPointer(texattr, 2, glad.GL_FLOAT, glad.GL_FALSE, 2 * sizeof(float), (IntPtr)(12 * sizeof(float)));
+                glad.GLVertexAttribPointer(texattr, 2, glad.GL_FLOAT, glad.GL_FALSE, 2 * sizeof(float), (IntPtr)(16 * sizeof(float)));
                 glad.GLEnableVertexAttribArray(texattr);
 
-                modunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultModelUniform);
-                viwunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultViewUniform);
-                prjunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultProjectionUniform);
+                //modunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultModelUniform);
+                //viwunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultViewUniform);
+                //prjunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultProjectionUniform);
+                mvpunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultMvpUniform);
             }
 
             public void Draw(Texture tex)
@@ -76,34 +79,40 @@ namespace Utubz.Graphics
                 glad.GLActiveTexture(glad.GL_TEXTURE0);
                 glad.GLBindTexture(glad.GL_TEXTURE_2D, tex.TextureId);
                 glad.GLBindBuffer(glad.GL_ARRAY_BUFFER, *vbo);
-                glad.GLBufferData(glad.GL_ARRAY_BUFFER, 20 * sizeof(float), (IntPtr)data, glad.GL_DYNAMIC_DRAW);
+                glad.GLBindVertexArray(*vao);
+                glad.GLBindBuffer(glad.GL_ELEMENT_ARRAY_BUFFER, *ebo);
                 glad.GLDrawElements(glad.GL_TRIANGLES, 6, glad.GL_UNSIGNED_INT, (IntPtr)0);
             }
 
             public void SetMvp(TMatrix model, TMatrix view, TMatrix projection)
             {
-                model.ToArrayPtr(this.model);
-                glad.GLUniformMatrix4fv(modunif, 1, 0, this.model);
-                view.ToArrayPtr(this.view);
-                glad.GLUniformMatrix4fv(viwunif, 1, 0, this.view);
-                projection.ToArrayPtr(this.projection);
-                glad.GLUniformMatrix4fv(prjunif, 1, 0, this.projection);
+                //model.ToArrayPtr(this.model);
+                //glad.GLUniformMatrix4fv(modunif, 1, 0, this.model);
+                //view.ToArrayPtr(this.view);
+                //glad.GLUniformMatrix4fv(viwunif, 1, 0, this.view);
+                //projection.ToArrayPtr(this.projection);
+                //glad.GLUniformMatrix4fv(prjunif, 1, 0, this.projection);
+                Debug.Log($"\nM:{model}\nV:{view}\nP:{projection}\nMVP:{(projection * view * model)}");
+                (projection * view * model).ToArrayPtr(this.mvp);
+                glad.GLUniformMatrix4fv(mvpunif, 1, 0, this.mvp);
             }
 
             public SRData()
             {
-                data = (float*)Marshal.AllocHGlobal(sizeof(float) * 20);
+                data = (float*)Marshal.AllocHGlobal(sizeof(float) * 24);
                 indices = (uint*)Marshal.AllocHGlobal(sizeof(uint) * 6);
                 vao = (uint*)Marshal.AllocHGlobal(sizeof(uint));
                 vbo = (uint*)Marshal.AllocHGlobal(sizeof(uint));
                 ebo = (uint*)Marshal.AllocHGlobal(sizeof(uint));
-                model = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                view = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                projection = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
+                //model = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
+                //view = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
+                //projection = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
+                mvp = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
                 posattr = 0;
                 colattr = 0;
                 texattr = 0;
-                prjunif = 0;
+                //prjunif = 0;
+                mvpunif = 0;
             }
 
             protected override void Clean()
@@ -116,21 +125,24 @@ namespace Utubz.Graphics
                 Marshal.FreeHGlobal((IntPtr)vao);
                 Marshal.FreeHGlobal((IntPtr)indices);
                 Marshal.FreeHGlobal((IntPtr)data);
-                Marshal.FreeHGlobal((IntPtr)projection);
-                Marshal.FreeHGlobal((IntPtr)view);
-                Marshal.FreeHGlobal((IntPtr)model);
+                //Marshal.FreeHGlobal((IntPtr)projection);
+                //Marshal.FreeHGlobal((IntPtr)view);
+                //Marshal.FreeHGlobal((IntPtr)model);
+                Marshal.FreeHGlobal((IntPtr)mvp);
                 posattr = 0;
                 colattr = 0;
                 texattr = 0;
-                prjunif = 0;
+                //prjunif = 0;
+                mvpunif = 0;
             }
         }
 
         private SRData data;
-
+        
         private void UpdateMatrix(Camera cam)
         {
-            data.SetMvp(Transform.Transform.Matrix, cam.ViewMatrix, cam.ProjectionMatrix);
+            //Debug.Log($"\nModel:{Transform.Transform.Matrix}\nView:{cam.ViewMatrix}\nProjection:{cam.ProjectionMatrix}");
+            data.SetMvp(Transform.Transform.LocalToWorld, cam.ViewMatrix, cam.ProjectionMatrix);
         }
 
         private void SetConstantData()
@@ -138,18 +150,22 @@ namespace Utubz.Graphics
             // Vertices
             data.SetData(0, 0.5f);
             data.SetData(1, 0.5f * Texture.HwRatio);
-            data.SetData(2, 0.5f);
-            data.SetData(3, -0.5f * Texture.HwRatio);
-            data.SetData(4, -0.5f);
-            data.SetData(5, -0.5f * Texture.HwRatio);
+            data.SetData(2, 0f);
+            data.SetData(3, 0.5f);
+            data.SetData(4, -0.5f * Texture.HwRatio);
+            data.SetData(5, 0f);
             data.SetData(6, -0.5f);
-            data.SetData(7, 0.5f * Texture.HwRatio);
+            data.SetData(7, -0.5f * Texture.HwRatio);
+            data.SetData(8, 0f);
+            data.SetData(9, -0.5f);
+            data.SetData(10, 0.5f * Texture.HwRatio);
+            data.SetData(11, 0f);
 
             // Color
-            data.SetData(8, 1.0f);
-            data.SetData(9, 1.0f);
-            data.SetData(10, 1.0f);
-            data.SetData(11, 1.0f);
+            data.SetData(12, 1.0f);
+            data.SetData(13, 1.0f);
+            data.SetData(14, 1.0f);
+            data.SetData(15, 1.0f);
 
             // Vertex Indices
             data.SetIndices(0, 0u);
@@ -160,14 +176,14 @@ namespace Utubz.Graphics
             data.SetIndices(5, 0u);
 
             // Texture Coordinates
-            data.SetData(12, 1.0f);
-            data.SetData(13, 1.0f);
-            data.SetData(14, 1.0f);
-            data.SetData(15, 0.0f);
-            data.SetData(16, 0.0f);
-            data.SetData(17, 0.0f);
-            data.SetData(18, 0.0f);
-            data.SetData(19, 1.0f);
+            data.SetData(16, 1.0f);
+            data.SetData(17, 1.0f);
+            data.SetData(18, 1.0f);
+            data.SetData(19, 0.0f);
+            data.SetData(20, 0.0f);
+            data.SetData(21, 0.0f);
+            data.SetData(22, 0.0f);
+            data.SetData(23, 1.0f);
         }
 
         protected override void Begin(Camera cam)

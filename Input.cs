@@ -124,6 +124,11 @@ namespace Utubz
             return new Vector3(KeyAxis(xpos, xneg), 0f, KeyAxis(ypos, yneg));
         }
 
+        public static Vector3 KeyDirection(Key xpos, Key xneg, Key ypos, Key yneg, Key zpos, Key zneg)
+        {
+            return new Vector3(KeyAxis(xpos, xneg), KeyAxis(ypos, yneg), KeyAxis(zpos, zneg));
+        }
+
         /// <summary>
         /// Pushes any changes made to the asynchronous <see cref="InputContext"/>.
         /// </summary>

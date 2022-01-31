@@ -16,15 +16,13 @@ in vec2 vTexCoord;
 out vec4 uColor;
 out vec2 uTexCoord;
 
-uniform mat4 tModel;
-uniform mat4 tView;
-uniform mat4 tProjection;
+uniform mat4 mvp;
 
 void main()
 {
     uColor = vColor;
     uTexCoord = vTexCoord;
-    gl_Position = tProjection * tView * tModel * vec4(vPosition, 1.0);
+    gl_Position = mvp * vec4(vPosition, 1.0);
 }";
         internal const string DefaultFragmentString = @"#version 460
 in vec4 uColor;

@@ -13,14 +13,13 @@ namespace Utubz
         private static readonly Transform identity = new Transform();
         public static Transform Identity => identity;
 
-        private TMatrix mat;
-        private Vector3 vec;
-
         public Vector3 Position;
         public Vector3 Rotation;
         public Vector3 Scale;
 
-        public TMatrix Matrix { get { mat.Modify(this); return mat; } set { mat = value; } }
+        public TMatrix Matrix { get { return TMatrix.Translation(Position) * TMatrix.RotationX(Rotation.x) * TMatrix.RotationY(Rotation.y) * TMatrix.RotationZ(Rotation.z) * TMatrix.Dilation(Scale); } }
+        public TMatrix LocalToWorld { get { return TMatrix.Translation(Position) * TMatrix.RotationX(Rotation.x) * TMatrix.RotationY(Rotation.y) * TMatrix.RotationZ(Rotation.z) * TMatrix.Dilation(Scale); } }
+        public TMatrix WorldToLocal { get { return TMatrix.Dilation(Vector3.One / Scale) * TMatrix.RotationZ(-Rotation.z) * TMatrix.RotationY(-Rotation.y) * TMatrix.RotationX(-Rotation.x) * TMatrix.Translation(-Position); } }
 
         public void Translate(Vector3 tra) => Position += tra;
         public void Rotate(Vector3 rot) => Rotation += rot;
@@ -30,15 +29,16 @@ namespace Utubz
         public Vector3 Right => Vector3.ToRightAxis(Rotation);
         public Vector3 Up => Vector3.ToUpAxis(Rotation);
 
-        public Transform Inverse { get { Transform t = identity; t.Position = -Position; t.Rotation = -Rotation; t.Scale = Vector3.One / Scale; return t; } }
+        public Vector3 Relative(Vector3 vec)
+            => vec.z * Forward + vec.y * Up + vec.x * Right;
+
+        public Transform Inverse { get { return WorldToLocal.GetTransform(); } }
 
         public Transform()
         {
             Position = Vector3.Zero;
             Rotation = Vector3.Zero;
             Scale = Vector3.One;
-            mat = TMatrix.Identity;
-            vec = Vector3.Zero;
         }
 
         public Transform(Vector3 position)
@@ -46,8 +46,6 @@ namespace Utubz
             Position = position;
             Rotation = Vector3.Zero;
             Scale = Vector3.One;
-            mat = TMatrix.Identity;
-            vec = Vector3.Zero;
         }
 
         public Transform(Vector3 position, Vector3 rotation)
@@ -55,8 +53,6 @@ namespace Utubz
             Position = position;
             Rotation = rotation;
             Scale = Vector3.One;
-            mat = TMatrix.Identity;
-            vec = Vector3.Zero;
         }
 
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
@@ -64,8 +60,6 @@ namespace Utubz
             Position = position;
             Rotation = rotation;
             Scale = scale;
-            mat = TMatrix.Identity;
-            vec = Vector3.Zero;
         }
 
         /// <summary>

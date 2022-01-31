@@ -18,6 +18,7 @@ namespace Utubz.Graphics
         internal const string DefaultModelUniform = "tModel";
         internal const string DefaultViewUniform = "tView";
         internal const string DefaultProjectionUniform = "tProjection";
+        internal const string DefaultMvpUniform = "mvp";
 
         public Shader Shader 
         { 

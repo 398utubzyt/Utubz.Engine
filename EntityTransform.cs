@@ -32,6 +32,8 @@ namespace Utubz
         public void Rotate(Vector3 rot) => t.Rotate(rot);
         public void Dilate(Vector3 dil) => t.Dilate(dil);
 
+        public Vector3 Relative(Vector3 vec) => t.Relative(vec);
+
         public Vector3 Position { get => t.Position; set => t.Position = value; }
         public Vector3 Rotation { get => t.Rotation; set => t.Rotation = value; }
         public Vector3 Scale { get => t.Scale; set => t.Scale = value; }

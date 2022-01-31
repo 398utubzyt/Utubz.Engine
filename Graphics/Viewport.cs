@@ -12,7 +12,7 @@ namespace Utubz.Graphics
         public int Width { get; set; }
         public int Height { get; set; }
         public float Ratio => (float)Width / Height;
-        private float InverseRatio => (float)Height / Width;
+        public float InverseRatio => (float)Height / Width;
 
         public Transform ToClipSpace(Transform view)
         {

@@ -19,6 +19,10 @@ namespace Utubz
             true
 #endif
             ;
+        public static void Clear()
+        {
+            
+        }
 
         public static void Log(string msg)
         {
