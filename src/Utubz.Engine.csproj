@@ -8,12 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Native\**" />
-    <EmbeddedResource Remove="Native\**" />
-    <None Remove="Native\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Flat\" />
   </ItemGroup>
 
