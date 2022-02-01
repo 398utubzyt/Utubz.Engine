@@ -14,23 +14,14 @@ namespace Utubz.Graphics
 
         private class SRData : Object
         {
-            public float* data;
-            public uint* indices;
+            public float[] data;
+            public uint[] indices;
             public GL.ArrayBuffer dbuf;
             public GL.ElementArrayBuffer ibuf;
             public GL.VertexArray aarr;
-
             public GL.VertexAttribute posattr;
             public GL.VertexAttribute colattr;
             public GL.VertexAttribute texattr;
-            //public uint prjunif;
-            //public uint viwunif;
-            //public uint modunif;
-            //public uint mvpunif;
-            //public float* model;
-            //public float* view;
-            //public float* projection;
-            //public float* mvp;
             public GL.ShaderUniform mvpunif;
 
             public void SetData(int index, float value)
@@ -45,13 +36,13 @@ namespace Utubz.Graphics
             public void GenBuffers()
             {
                 dbuf = new GL.ArrayBuffer();
-                dbuf.Set(data, 24);
+                dbuf.Set(data);
 
                 aarr = new GL.VertexArray();
                 aarr.Bind();
 
                 ibuf = new GL.ElementArrayBuffer();
-                ibuf.Set(indices, 6);
+                ibuf.Set(indices);
             }
 
             public void InitAttr(Shader shader)
@@ -84,8 +75,8 @@ namespace Utubz.Graphics
 
             public SRData()
             {
-                data = (float*)Marshal.AllocHGlobal(sizeof(float) * 24);
-                indices = (uint*)Marshal.AllocHGlobal(sizeof(uint) * 6);
+                data = new float[24];
+                indices = new uint[6];
             }
 
             protected override void Clean()
@@ -93,8 +84,6 @@ namespace Utubz.Graphics
                 ibuf.Destroy();
                 aarr.Destroy();
                 dbuf.Destroy();
-                Marshal.FreeHGlobal((IntPtr)indices);
-                Marshal.FreeHGlobal((IntPtr)data);
                 posattr.Destroy();
                 colattr.Destroy();
                 texattr.Destroy();
