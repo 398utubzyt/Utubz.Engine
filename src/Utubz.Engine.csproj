@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Flat\" />
+    <None Remove="**\README.md" />
   </ItemGroup>
 
 </Project>

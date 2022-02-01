@@ -1,2 +1,2 @@
 # Utubz.Engine
- A C# library for rendering with OpenGL
+ A C# framework for making games.
