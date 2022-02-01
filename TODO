@@ -5,3 +5,4 @@
 - Add Utubz.Flat for 2D functionality
 - Create SDL2 bindings in Utubz.Internal.Native
 - Create SDL2 backend as an alternative to GLFW
+- Fix the perspective projection transformations
