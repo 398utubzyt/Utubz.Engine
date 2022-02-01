@@ -30,7 +30,7 @@ namespace Utubz.Graphics
         protected sealed override unsafe void Init()
         {
             if (Null(Shader))
-                Shader = Shader.Debug;
+                Shader = Shader.Default;
 
             Scene.Add(this);
         }

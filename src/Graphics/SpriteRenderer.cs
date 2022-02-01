@@ -142,7 +142,7 @@ namespace Utubz.Graphics
         protected override void Begin(Camera cam)
         {
             if (Null(Shader))
-                Shader = Shader.Debug;
+                Shader = Shader.Default;
 
             if (Null(Texture))
                 //Texture = Texture.Color(64, 64, Color.White);

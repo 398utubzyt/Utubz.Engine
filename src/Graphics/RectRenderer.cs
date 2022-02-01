@@ -5,103 +5,167 @@ using Utubz.Internal.Native.Glad;
 
 namespace Utubz.Graphics
 {
+    /// <summary>
+    /// Renders a quad.
+    /// </summary>
     public sealed unsafe class RectRenderer : Renderer
     {
-        private float* v;
-        private int* i;
-        private uint vao;
-        private uint vbo;
-        private uint ebo;
-        private uint pa;
-        private uint ca;
+        private Texture Texture { get; set; }
 
-        public void UpdateTransform(Camera cam)
+        private class RRData : Object
         {
-            Transform t = Scene.Window.Viewport.ToClipSpace(Transform.Transform);
-            v[0] = t.Position.x + t.Scale.x * 0.5f;
-            v[1] = t.Position.y + t.Scale.y * 0.5f;
-            v[5] = t.Position.x + t.Scale.x * 0.5f;
-            v[6] = t.Position.y - t.Scale.y * 0.5f;
-            v[10] = t.Position.x - t.Scale.x * 0.5f;
-            v[11] = t.Position.y - t.Scale.y * 0.5f;
-            v[15] = t.Position.x - t.Scale.x * 0.5f;
-            v[16] = t.Position.y + t.Scale.y * 0.5f;
+            public float[] data;
+            public uint[] indices;
+            public GL.ArrayBuffer dbuf;
+            public GL.ElementArrayBuffer ibuf;
+            public GL.VertexArray aarr;
+            public GL.VertexAttribute posattr;
+            public GL.VertexAttribute colattr;
+            public GL.VertexAttribute texattr;
+            public GL.ShaderUniform mvpunif;
+
+            public void SetData(int index, float value)
+            {
+                data[index] = value;
+            }
+            public void SetIndices(int index, uint vertex)
+            {
+                indices[index] = vertex;
+            }
+
+            public void GenBuffers()
+            {
+                dbuf = new GL.ArrayBuffer();
+                dbuf.Set(data);
+
+                aarr = new GL.VertexArray();
+                aarr.Bind();
+
+                ibuf = new GL.ElementArrayBuffer();
+                ibuf.Set(indices);
+            }
+
+            public void InitAttr(Shader shader)
+            {
+                posattr = GL.VertexAttribute.Find(shader, DefaultVertexPositionAttribute);
+                posattr.Set(dbuf, 3, 3, 0);
+                posattr.Enable();
+
+                colattr = GL.VertexAttribute.Find(shader, DefaultVertexColorAttribute);
+                colattr.Set(dbuf, 4, 0, 12);
+                colattr.Enable();
+
+                texattr = GL.VertexAttribute.Find(shader, DefaultVertexTexCoordAttribute);
+                texattr.Set(dbuf, 2, 2, 16);
+                texattr.Enable();
+
+                mvpunif = GL.ShaderUniform.Find(shader, DefaultMvpUniform);
+            }
+
+            public void Draw(Texture tex)
+            {
+                GL.UseTexture(tex, 0);
+                GL.DrawTriangles(dbuf, ibuf, aarr);
+            }
+
+            public void SetMvp(TMatrix model, TMatrix view, TMatrix projection)
+            {
+                mvpunif.Set(projection * view * model);
+            }
+
+            public RRData()
+            {
+                data = new float[24];
+                indices = new uint[6];
+            }
+
+            protected override void Clean()
+            {
+                ibuf.Destroy();
+                aarr.Destroy();
+                dbuf.Destroy();
+                posattr.Destroy();
+                colattr.Destroy();
+                texattr.Destroy();
+                mvpunif.Destroy();
+            }
         }
 
-        protected override unsafe void Begin(Camera cam)
+        private RRData data;
+
+        private void UpdateMatrix(Camera cam)
+        {
+            data.SetMvp(Transform.Transform.LocalToWorld, cam.ViewMatrix, cam.ProjectionMatrix);
+        }
+
+        private void SetConstantData()
+        {
+            // Vertices
+            data.SetData(0, 0.5f);
+            data.SetData(1, 0.5f);
+            data.SetData(2, 0f);
+            data.SetData(3, 0.5f);
+            data.SetData(4, -0.5f);
+            data.SetData(5, 0f);
+            data.SetData(6, -0.5f);
+            data.SetData(7, -0.5f);
+            data.SetData(8, 0f);
+            data.SetData(9, -0.5f);
+            data.SetData(10, 0.5f);
+            data.SetData(11, 0f);
+
+            // Color
+            data.SetData(12, 1.0f);
+            data.SetData(13, 1.0f);
+            data.SetData(14, 1.0f);
+            data.SetData(15, 1.0f);
+
+            // Vertex Indices
+            data.SetIndices(0, 0u);
+            data.SetIndices(1, 1u);
+            data.SetIndices(2, 2u);
+            data.SetIndices(3, 2u);
+            data.SetIndices(4, 3u);
+            data.SetIndices(5, 0u);
+
+            // Texture Coordinates
+            data.SetData(16, 1.0f);
+            data.SetData(17, 1.0f);
+            data.SetData(18, 1.0f);
+            data.SetData(19, 0.0f);
+            data.SetData(20, 0.0f);
+            data.SetData(21, 0.0f);
+            data.SetData(22, 0.0f);
+            data.SetData(23, 1.0f);
+        }
+
+        protected override void Begin(Camera cam)
         {
             if (Null(Shader))
-                Shader = Shader.Debug;
+                Shader = Shader.Default;
 
-            v = (float*)Marshal.AllocHGlobal(sizeof(float) * 20);
-            i = (int*)Marshal.AllocHGlobal(sizeof(int) * 6);
+            if (Null(Texture))
+                Texture = Texture.Color(64, 64, Color.White);
+                //Texture = Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png");
 
-            vao = 0;
-            vbo = 0;
-            ebo = 0;
+            data = new RRData();
 
-            UpdateTransform(cam);
+            SetConstantData();
 
-            v[2] = 1.0f;
-            v[3] = 0.0f;
-            v[4] = 0.0f;
-
-            v[7] = 0.0f;
-            v[8] = 1.0f;
-            v[9] = 0.0f;
-
-            v[12] = 0.0f;
-            v[13] = 0.0f;
-            v[14] = 1.0f;
-
-            v[17] = 1.0f;
-            v[18] = 1.0f;
-            v[19] = 1.0f;
-
-            i[0] = 0;
-            i[1] = 1;
-            i[2] = 2;
-            i[3] = 2;
-            i[4] = 3;
-            i[5] = 0;
-
-            uint _vbo = 0;
-            glad.GLGenBuffers(1, &_vbo);
-            vbo = _vbo;
-            glad.GLBindBuffer(glad.GL_ARRAY_BUFFER, vbo);
-            glad.GLBufferData(glad.GL_ARRAY_BUFFER, 20 * sizeof(float), (IntPtr)v, glad.GL_DYNAMIC_DRAW);
-
-            uint _vao = 0;
-            glad.GLGenVertexArrays(1, &_vao);
-            vao = _vao;
-            glad.GLBindVertexArray(vao);
-
-            uint _ebo = 0;
-            glad.GLGenBuffers(1, &_ebo);
-            ebo = _ebo;
-            glad.GLBindBuffer(glad.GL_ELEMENT_ARRAY_BUFFER, ebo);
-            glad.GLBufferData(glad.GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(int), (IntPtr)i, glad.GL_DYNAMIC_DRAW);
-
-            pa = glad.GLGetAttribLocation(Shader.ShaderId, "position");
-            glad.GLVertexAttribPointer(pa, 2, glad.GL_FLOAT, glad.GL_FALSE, 5 * sizeof(float), (IntPtr)0);
-            glad.GLEnableVertexAttribArray(pa);
-
-            ca = glad.GLGetAttribLocation(Shader.ShaderId, "color");
-            glad.GLVertexAttribPointer(ca, 3, glad.GL_FLOAT, glad.GL_FALSE, 5 * sizeof(float), (IntPtr)(2 * sizeof(float)));
-            glad.GLEnableVertexAttribArray(ca);
+            data.GenBuffers();
+            data.InitAttr(Shader);
+            UpdateMatrix(cam);
         }
 
         protected override void End()
         {
-            Marshal.FreeHGlobal((IntPtr)v);
-            Marshal.FreeHGlobal((IntPtr)i);
+            data.Destroy();
         }
 
         protected override void Render(Camera cam)
         {
-            UpdateTransform(cam);
-            glad.GLBufferData(glad.GL_ARRAY_BUFFER, 20 * sizeof(float), (IntPtr)v, glad.GL_DYNAMIC_DRAW);
-            glad.GLDrawElements(glad.GL_TRIANGLES, 6, glad.GL_UNSIGNED_INT, (IntPtr)0);
+            UpdateMatrix(cam);
+            data.Draw(Texture);
         }
     }
 }
