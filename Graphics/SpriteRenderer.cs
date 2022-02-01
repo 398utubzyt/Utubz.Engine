@@ -16,20 +16,22 @@ namespace Utubz.Graphics
         {
             public float* data;
             public uint* indices;
-            public uint* vao;
-            public uint* vbo;
-            public uint* ebo;
-            public uint posattr;
-            public uint colattr;
-            public uint texattr;
+            public GL.ArrayBuffer dbuf;
+            public GL.ElementArrayBuffer ibuf;
+            public GL.VertexArray aarr;
+
+            public GL.VertexAttribute posattr;
+            public GL.VertexAttribute colattr;
+            public GL.VertexAttribute texattr;
             //public uint prjunif;
             //public uint viwunif;
             //public uint modunif;
-            public uint mvpunif;
+            //public uint mvpunif;
             //public float* model;
             //public float* view;
             //public float* projection;
-            public float* mvp;
+            //public float* mvp;
+            public GL.ShaderUniform mvpunif;
 
             public void SetData(int index, float value)
             {
@@ -42,97 +44,61 @@ namespace Utubz.Graphics
 
             public void GenBuffers()
             {
-                glad.GLGenBuffers(1, vbo);
-                glad.GLBindBuffer(glad.GL_ARRAY_BUFFER, *vbo);
-                glad.GLBufferData(glad.GL_ARRAY_BUFFER, 24 * sizeof(float), (IntPtr)data, glad.GL_DYNAMIC_DRAW);
+                dbuf = new GL.ArrayBuffer();
+                dbuf.Set(data, 24);
 
-                glad.GLGenVertexArrays(1, vao);
-                glad.GLBindVertexArray(*vao);
+                aarr = new GL.VertexArray();
+                aarr.Bind();
 
-                glad.GLGenBuffers(1, ebo);
-                glad.GLBindBuffer(glad.GL_ELEMENT_ARRAY_BUFFER, *ebo);
-                glad.GLBufferData(glad.GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(uint), (IntPtr)indices, glad.GL_DYNAMIC_DRAW);
+                ibuf = new GL.ElementArrayBuffer();
+                ibuf.Set(indices, 6);
             }
 
             public void InitAttr(Shader shader)
             {
-                posattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexPositionAttribute);
-                glad.GLVertexAttribPointer(posattr, 3, glad.GL_FLOAT, glad.GL_FALSE, 3 * sizeof(float), (IntPtr)0);
-                glad.GLEnableVertexAttribArray(posattr);
+                posattr = GL.VertexAttribute.Find(shader, DefaultVertexPositionAttribute);
+                posattr.Set(dbuf, 3, 3, 0);
+                posattr.Enable();
 
-                colattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexColorAttribute);
-                glad.GLVertexAttribPointer(colattr, 4, glad.GL_FLOAT, glad.GL_FALSE, 0, (IntPtr)(12 * sizeof(float)));
-                glad.GLEnableVertexAttribArray(colattr);
+                colattr = GL.VertexAttribute.Find(shader, DefaultVertexColorAttribute);
+                colattr.Set(dbuf, 4, 0, 12);
+                colattr.Enable();
 
-                texattr = glad.GLGetAttribLocation(shader.ShaderId, DefaultVertexTexCoordAttribute);
-                glad.GLVertexAttribPointer(texattr, 2, glad.GL_FLOAT, glad.GL_FALSE, 2 * sizeof(float), (IntPtr)(16 * sizeof(float)));
-                glad.GLEnableVertexAttribArray(texattr);
+                texattr = GL.VertexAttribute.Find(shader, DefaultVertexTexCoordAttribute);
+                texattr.Set(dbuf, 2, 2, 16);
+                texattr.Enable();
 
-                //modunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultModelUniform);
-                //viwunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultViewUniform);
-                //prjunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultProjectionUniform);
-                mvpunif = glad.GLGetUniformLocation(shader.ShaderId, DefaultMvpUniform);
+                mvpunif = GL.ShaderUniform.Find(shader, DefaultMvpUniform);
             }
 
             public void Draw(Texture tex)
             {
-                glad.GLActiveTexture(glad.GL_TEXTURE0);
-                glad.GLBindTexture(glad.GL_TEXTURE_2D, tex.TextureId);
-                glad.GLBindBuffer(glad.GL_ARRAY_BUFFER, *vbo);
-                glad.GLBindVertexArray(*vao);
-                glad.GLBindBuffer(glad.GL_ELEMENT_ARRAY_BUFFER, *ebo);
-                glad.GLDrawElements(glad.GL_TRIANGLES, 6, glad.GL_UNSIGNED_INT, (IntPtr)0);
+                GL.UseTexture(tex, 0);
+                GL.DrawTriangles(dbuf, ibuf, aarr);
             }
 
             public void SetMvp(TMatrix model, TMatrix view, TMatrix projection)
             {
-                //model.ToArrayPtr(this.model);
-                //glad.GLUniformMatrix4fv(modunif, 1, 0, this.model);
-                //view.ToArrayPtr(this.view);
-                //glad.GLUniformMatrix4fv(viwunif, 1, 0, this.view);
-                //projection.ToArrayPtr(this.projection);
-                //glad.GLUniformMatrix4fv(prjunif, 1, 0, this.projection);
-                (projection * view * model).ToArrayPtr(this.mvp);
-                glad.GLUniformMatrix4fv(mvpunif, 1, 0, this.mvp);
+                mvpunif.Set(projection * view * model);
             }
 
             public SRData()
             {
                 data = (float*)Marshal.AllocHGlobal(sizeof(float) * 24);
                 indices = (uint*)Marshal.AllocHGlobal(sizeof(uint) * 6);
-                vao = (uint*)Marshal.AllocHGlobal(sizeof(uint));
-                vbo = (uint*)Marshal.AllocHGlobal(sizeof(uint));
-                ebo = (uint*)Marshal.AllocHGlobal(sizeof(uint));
-                //model = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                //view = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                //projection = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                mvp = (float*)Marshal.AllocHGlobal(sizeof(float) * 16);
-                posattr = 0;
-                colattr = 0;
-                texattr = 0;
-                //prjunif = 0;
-                mvpunif = 0;
             }
 
             protected override void Clean()
             {
-                glad.GLDeleteBuffers(1, ebo);
-                Marshal.FreeHGlobal((IntPtr)ebo);
-                glad.GLDeleteBuffers(1, vbo);
-                Marshal.FreeHGlobal((IntPtr)vbo);
-                glad.GLDeleteVertexArrays(1, vao);
-                Marshal.FreeHGlobal((IntPtr)vao);
+                ibuf.Destroy();
+                aarr.Destroy();
+                dbuf.Destroy();
                 Marshal.FreeHGlobal((IntPtr)indices);
                 Marshal.FreeHGlobal((IntPtr)data);
-                //Marshal.FreeHGlobal((IntPtr)projection);
-                //Marshal.FreeHGlobal((IntPtr)view);
-                //Marshal.FreeHGlobal((IntPtr)model);
-                Marshal.FreeHGlobal((IntPtr)mvp);
-                posattr = 0;
-                colattr = 0;
-                texattr = 0;
-                //prjunif = 0;
-                mvpunif = 0;
+                posattr.Destroy();
+                colattr.Destroy();
+                texattr.Destroy();
+                mvpunif.Destroy();
             }
         }
 
@@ -140,7 +106,6 @@ namespace Utubz.Graphics
         
         private void UpdateMatrix(Camera cam)
         {
-            //Debug.Log($"\nModel:{Transform.Transform.Matrix}\nView:{cam.ViewMatrix}\nProjection:{cam.ProjectionMatrix}");
             data.SetMvp(Transform.Transform.LocalToWorld, cam.ViewMatrix, cam.ProjectionMatrix);
         }
 

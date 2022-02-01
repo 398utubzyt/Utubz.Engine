@@ -446,58 +446,58 @@ namespace Utubz.Internal.Native.Glad
     internal unsafe delegate void PFNGLUSEPROGRAMPROC(uint program);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM1FPROC(int location, int v0);
+    internal unsafe delegate void PFNGLUNIFORM1FPROC(uint location, float v0);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM2FPROC(int location, int v0, int v1);
+    internal unsafe delegate void PFNGLUNIFORM2FPROC(uint location, float v0, float v1);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM3FPROC(int location, int v0, int v1, int v2);
+    internal unsafe delegate void PFNGLUNIFORM3FPROC(uint location, float v0, float v1, float v2);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM4FPROC(int location, int v0, int v1, int v2, int v3);
+    internal unsafe delegate void PFNGLUNIFORM4FPROC(uint location, float v0, float v1, float v2, float v3);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM1IPROC(int location, int v0);
+    internal unsafe delegate void PFNGLUNIFORM1IPROC(uint location, int v0);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM2IPROC(int location, int v0, int v1);
+    internal unsafe delegate void PFNGLUNIFORM2IPROC(uint location, int v0, int v1);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM3IPROC(int location, int v0, int v1, int v2);
+    internal unsafe delegate void PFNGLUNIFORM3IPROC(uint location, int v0, int v1, int v2);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM4IPROC(int location, int v0, int v1, int v2, int v3);
+    internal unsafe delegate void PFNGLUNIFORM4IPROC(uint location, int v0, int v1, int v2, int v3);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM1FVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM1FVPROC(uint location, int count, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM2FVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM2FVPROC(uint location, int count, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM3FVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM3FVPROC(uint location, int count, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM4FVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM4FVPROC(uint location, int count, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM1IVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM1IVPROC(uint location, int count, int* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM2IVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM2IVPROC(uint location, int count, int* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM3IVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM3IVPROC(uint location, int count, int* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORM4IVPROC(int location, int count, int* value);
+    internal unsafe delegate void PFNGLUNIFORM4IVPROC(uint location, int count, int* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORMMATRIX2FVPROC(int location, int count, byte transpose, int* value);
+    internal unsafe delegate void PFNGLUNIFORMMATRIX2FVPROC(uint location, int count, byte transpose, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLUNIFORMMATRIX3FVPROC(int location, int count, byte transpose, int* value);
+    internal unsafe delegate void PFNGLUNIFORMMATRIX3FVPROC(uint location, int count, byte transpose, float* value);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void PFNGLUNIFORMMATRIX4FVPROC(uint location, int count, byte transpose, float* value);

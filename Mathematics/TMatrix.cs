@@ -953,6 +953,49 @@ namespace Utubz
             ptr[15] = m33;
         }
 
+        internal float[] ToArray()
+        {
+            return new float[16]
+            {
+                m00,
+                m10,
+                m20,
+                m30,
+                m01,
+                m11,
+                m21,
+                m31,
+                m02,
+                m12,
+                m22,
+                m32,
+                m03,
+                m13,
+                m23,
+                m33
+            };
+        }
+
+        internal void SetArray(ref float[] arr)
+        {
+            arr[0] = m00;
+            arr[1] = m10;
+            arr[2] = m20;
+            arr[3] = m30;
+            arr[4] = m01;
+            arr[5] = m11;
+            arr[6] = m21;
+            arr[7] = m31;
+            arr[8] = m02;
+            arr[9] = m12;
+            arr[10] = m22;
+            arr[11] = m32;
+            arr[12] = m03;
+            arr[13] = m13;
+            arr[14] = m23;
+            arr[15] = m33;
+        }
+
         private class TMatrixFovLessThanEqualToZeroException : Exception
         {
             public TMatrixFovLessThanEqualToZeroException() : base("Field of view angle cannot be less than or equal to zero.")

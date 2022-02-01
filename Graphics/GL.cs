@@ -15,6 +15,7 @@ namespace Utubz.Graphics
             internal IntPtr data;
             internal int len;
             internal int size;
+            internal uint type;
 
             public void Bind()
             {
@@ -23,22 +24,26 @@ namespace Utubz.Graphics
 
             public void Set<T>(T[] arr) where T : unmanaged
             {
-                glad.GLBindBuffer(GlType, id);
+                Bind();
 
                 fixed (T* ptr = arr) { data = (IntPtr)ptr; }
                 len = arr.Length;
                 size = sizeof(T);
-                glad.GLBufferData(GlType, len * size, data, 0);
+                glad.GLBufferData(GlType, len * size, data, glad.GL_DYNAMIC_DRAW);
+
+                type = (uint)GetGraphicsType<T>();
             }
 
             public void Set<T>(T* ptr, int length) where T : unmanaged
             {
-                glad.GLBindBuffer(GlType, id);
+                Bind();
 
                 data = (IntPtr)ptr;
                 len = length;
                 size = sizeof(T);
-                glad.GLBufferData(GlType, len * size, data, 0);
+                glad.GLBufferData(GlType, len * size, data, glad.GL_DYNAMIC_DRAW);
+
+                type = (uint)GetGraphicsType<T>();
             }
 
             protected override void Clean()
@@ -98,38 +103,10 @@ namespace Utubz.Graphics
             public uint Location { get; }
 
 
-            public void Set<T>(Buffer buffer, int step, int start) where T : unmanaged
+            public void Set(Buffer buffer, int size, int step, int start)
             {
-                Type t;
-                switch (typeof(T).Name)
-                {
-                    case "SByte":
-                        t = Type.Sbyte;
-                        break;
-                    case "Byte":
-                        t = Type.Byte;
-                        break;
-                    case "Int16":
-                        t = Type.Short;
-                        break;
-                    case "UInt16":
-                        t = Type.Ushort;
-                        break;
-                    case "Int32":
-                        t = Type.Int;
-                        break;
-                    case "UInt32":
-                        t = Type.Uint;
-                        break;
-                    case "Single":
-                        t = Type.Float;
-                        break;
-                    default:
-                        return;
-                }
-
                 buffer.Bind();
-                glad.GLVertexAttribPointer(Location, buffer.len, (uint)t, 0, step * buffer.size, (IntPtr)(start * buffer.size));
+                glad.GLVertexAttribPointer(Location, size, buffer.type, 0, step * buffer.size, (IntPtr)(start * buffer.size));
             }
 
             public void Enable()
@@ -157,26 +134,178 @@ namespace Utubz.Graphics
             }
         }
 
+        public sealed class ShaderUniform : Object
+        {
+            public string Name { get; }
+            public uint Location { get; }
+            private void* data;
+
+            #region Set
+            public void Set(float x)
+            {
+                ConvertToPtr(x, (float*)data);
+                glad.GLUniform1fv(Location, 1, (float*)data);
+            }
+            public void Set(Vector2 x)
+            {
+                ConvertToPtr(x, (float*)data);
+                glad.GLUniform2fv(Location, 1, (float*)data);
+            }
+            public void Set(Vector3 x)
+            {
+                ConvertToPtr(x, (float*)data);
+                glad.GLUniform1fv(Location, 1, (float*)data);
+            }
+            public void Set(Color x)
+            {
+                ConvertToPtr(x, (float*)data);
+                glad.GLUniform1fv(Location, 1, (float*)data);
+            }
+            public void Set(TMatrix x)
+            {
+                ConvertToPtr(x, (float*)data);
+                glad.GLUniformMatrix4fv(Location, 1, 0, (float*)data);
+            }
+            #endregion
+
+            public static ShaderUniform Find(Shader shader, string name)
+            {
+                uint loc = glad.GLGetUniformLocation(shader.ShaderId, name);
+                if (loc >= 0)
+                    return new ShaderUniform(name, loc);
+                return null;
+            }
+
+            protected override void Clean()
+            {
+                Marshal.FreeHGlobal((IntPtr)data);
+            }
+
+            private ShaderUniform(string name, uint id)
+            {
+                Name = name;
+                Location = id;
+                data = (void*)Marshal.AllocHGlobal(16 * sizeof(float));
+            }
+        }
+
         #endregion
 
         #region Enums
 
         public enum Type
         {
+            Unknown = 0x0000,
             Sbyte   = 0x1400,
-            Byte  = 0x1401,
-            Short  = 0x1402,
-            Ushort = 0x1403,
-            Int    = 0x1404,
-            Uint   = 0x1405,
-            Float  = 0x1406,
+            Byte    = 0x1401,
+            Short   = 0x1402,
+            Ushort  = 0x1403,
+            Int     = 0x1404,
+            Uint    = 0x1405,
+            Float   = 0x1406,
         }
 
         #endregion
+
+        #region Util
 
         public static void Bind(Buffer buf)
         {
             buf.Bind();
         }
+
+        public static Type GetGraphicsType<T>() where T : unmanaged
+        {
+            switch (typeof(T).Name)
+            {
+                case "SByte":
+                    return Type.Sbyte;
+                case "Byte":
+                    return Type.Byte;
+                case "Int16":
+                    return Type.Short;
+                case "UInt16":
+                    return Type.Ushort;
+                case "Int32":
+                    return Type.Int;
+                case "UInt32":
+                    return Type.Uint;
+                case "Single":
+                    return Type.Float;
+                default:
+                    return Type.Unknown;
+            }
+        }
+
+        public static void TargetTexture(uint index)
+        {
+            glad.GLActiveTexture(0x84C0 + index);
+        }
+
+        public static void Bind(Texture texture)
+        {
+            glad.GLBindTexture(glad.GL_TEXTURE_2D, texture.TextureId);
+        }
+
+        public static void UseTexture(Texture texture, uint index)
+        {
+            TargetTexture(index);
+            Bind(texture);
+        }
+
+        public static void DrawTriangles(ArrayBuffer vbo, ElementArrayBuffer ebo, VertexArray vao)
+        {
+            vbo.Bind();
+            vao.Bind();
+            ebo.Bind();
+            glad.GLDrawElements(glad.GL_TRIANGLES, ebo.len, ebo.type, (IntPtr)0);
+        }
+
+        #endregion
+
+        #region Pointer Conversion
+
+        public static void ConvertToPtr(byte x, byte* ptr)
+        {
+            ptr[0] = x;
+        }
+
+        public static void ConvertToPtr(int x, int* ptr)
+        {
+            ptr[0] = x;
+        }
+
+        public static void ConvertToPtr(float x, float* ptr)
+        {
+            ptr[0] = x;
+        }
+
+        public static void ConvertToPtr(Vector2 x, float* ptr)
+        {
+            ptr[0] = x.x;
+            ptr[1] = x.y;
+        }
+
+        public static void ConvertToPtr(Vector3 x, float* ptr)
+        {
+            ptr[0] = x.x;
+            ptr[1] = x.y;
+            ptr[2] = x.z;
+        }
+
+        public static void ConvertToPtr(Color x, float* ptr)
+        {
+            ptr[0] = x.r;
+            ptr[1] = x.g;
+            ptr[2] = x.b;
+            ptr[3] = x.a;
+        }
+
+        public static void ConvertToPtr(TMatrix x, float* ptr)
+        {
+            x.ToArrayPtr(ptr);
+        }
+
+        #endregion
     }
 }
