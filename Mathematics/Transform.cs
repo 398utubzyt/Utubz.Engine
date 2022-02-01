@@ -17,9 +17,9 @@ namespace Utubz
         public Vector3 Rotation;
         public Vector3 Scale;
 
-        public TMatrix Matrix { get { return TMatrix.Translation(Position) * TMatrix.RotationX(Rotation.x) * TMatrix.RotationY(Rotation.y) * TMatrix.RotationZ(Rotation.z) * TMatrix.Dilation(Scale); } }
-        public TMatrix LocalToWorld { get { return TMatrix.Translation(Position) * TMatrix.RotationX(Rotation.x) * TMatrix.RotationY(Rotation.y) * TMatrix.RotationZ(Rotation.z) * TMatrix.Dilation(Scale); } }
-        public TMatrix WorldToLocal { get { return TMatrix.Dilation(Vector3.One / Scale) * TMatrix.RotationZ(-Rotation.z) * TMatrix.RotationY(-Rotation.y) * TMatrix.RotationX(-Rotation.x) * TMatrix.Translation(-Position); } }
+        public TMatrix Matrix { get { return TMatrix.Translation(Position) * TMatrix.Rotation(Rotation) * TMatrix.Dilation(Scale); } }
+        public TMatrix LocalToWorld { get { return TMatrix.Translation(Position) * TMatrix.Rotation(Rotation) * TMatrix.Dilation(Scale); } }
+        public TMatrix WorldToLocal { get { return TMatrix.Dilation(Vector3.One / Scale) * TMatrix.Rotation(-Rotation) * TMatrix.Translation(-Position); } }
 
         public void Translate(Vector3 tra) => Position += tra;
         public void Rotate(Vector3 rot) => Rotation += rot;
@@ -31,6 +31,8 @@ namespace Utubz
 
         public Vector3 Relative(Vector3 vec)
             => vec.z * Forward + vec.y * Up + vec.x * Right;
+        public Vector3 RelativeNoY(Vector3 vec)
+            => vec.z * Forward.NormalizedZeroY() + vec.y * Vector3.Up + vec.x * Right.NormalizedZeroY();
 
         public Transform Inverse { get { return WorldToLocal.GetTransform(); } }
 

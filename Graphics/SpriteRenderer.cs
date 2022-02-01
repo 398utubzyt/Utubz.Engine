@@ -92,7 +92,6 @@ namespace Utubz.Graphics
                 //glad.GLUniformMatrix4fv(viwunif, 1, 0, this.view);
                 //projection.ToArrayPtr(this.projection);
                 //glad.GLUniformMatrix4fv(prjunif, 1, 0, this.projection);
-                Debug.Log($"\nM:{model}\nV:{view}\nP:{projection}\nMVP:{(projection * view * model)}");
                 (projection * view * model).ToArrayPtr(this.mvp);
                 glad.GLUniformMatrix4fv(mvpunif, 1, 0, this.mvp);
             }
@@ -189,7 +188,7 @@ namespace Utubz.Graphics
         protected override void Begin(Camera cam)
         {
             if (Null(Shader))
-                Shader = Shader.Default;
+                Shader = Shader.Debug;
 
             if (Null(Texture))
                 //Texture = Texture.Color(64, 64, Color.White);

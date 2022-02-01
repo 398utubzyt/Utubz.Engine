@@ -71,8 +71,8 @@ namespace Utubz.Async
 
         public Vector2 MouseScroll()
         {
-            mvec.x = (float)mdata[4];
-            mvec.y = (float)mdata[5];
+            mvec.x = (float)mdata[6];
+            mvec.y = (float)mdata[7];
             return mvec;
         }
 
@@ -81,10 +81,14 @@ namespace Utubz.Async
             Array.Clear(state, 0, size);
             Array.Copy(updated, 0, state, 0, size);
             Array.Copy(frame, 0, updated, 0, size);
+
             mdata[0] = mdata[2];
             mdata[1] = mdata[3];
-            mdata[4] = mdata[6];
-            mdata[5] = mdata[7];
+            mdata[2] = mdata[4];
+            mdata[3] = mdata[5];
+
+            mdata[6] = mdata[8];
+            mdata[7] = mdata[9];
         }
 
         public void Modify(Key key, bool pressed)
@@ -115,14 +119,14 @@ namespace Utubz.Async
 
         internal void Change(double x, double y)
         {
-            mdata[2] = x;
-            mdata[3] = x;
+            mdata[4] = x;
+            mdata[5] = y;
         }
 
         internal void Scroll(double x, double y)
         {
-            mdata[6] = x;
-            mdata[7] = y;
+            mdata[8] = x;
+            mdata[9] = y;
         }
 
         public Window Window { get; }
@@ -133,7 +137,7 @@ namespace Utubz.Async
             state = new sbyte[size];
             updated = new sbyte[size];
             frame = new sbyte[size];
-            mdata = new double[8];
+            mdata = new double[10];
             mvec = Vector2.Zero;
         }
     }

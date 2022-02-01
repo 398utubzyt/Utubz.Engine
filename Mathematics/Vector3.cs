@@ -311,6 +311,18 @@ namespace Utubz
             return v;
         }
 
+        public Vector3 ZeroY()
+        {
+            y = 0f;
+            return this;
+        }
+
+        public Vector3 NormalizedZeroY()
+        {
+            y = 0f;
+            return Normalized();
+        }
+
         public static Vector3 ToForwardAxis(Vector3 vec)
             => ToForwardAxis(vec.x, vec.y, vec.z);
 

@@ -594,7 +594,7 @@ namespace Utubz
 
         public static TMatrix Rotation(Vector3 v)
         {
-            return Identity.RotateX(v.x) * Identity.RotateY(v.y) * Identity.RotateZ(v.z);
+            return RotationZ(v.z) * RotationX(v.x) * RotationY(v.y);
         }
 
         public static TMatrix RotationX(float a)
@@ -624,7 +624,7 @@ namespace Utubz
 
         public TMatrix Rotate(Vector3 v)
         {
-            return RotateX(this, v.x).RotateY(this, v.y).RotateZ(this, v.z);
+            return Rotate(this, v);
         }
 
         public TMatrix RotateX(float a)
@@ -651,6 +651,41 @@ namespace Utubz
         {
             t.Position = p;
             return t;
+        }
+
+        private TMatrix Rotate(TMatrix t, Vector3 a)
+        {
+            //_scrx = Math.SinCos(a.z);
+            //_scry = Math.SinCos(a.y);
+            //_scrz = Math.SinCos(a.x);
+
+            //t.AxisY.y += Math.Cos(a.x);
+            //t.AxisY.z += Math.Sin(a.x);
+            //t.AxisZ.y += -Math.Sin(a.x);
+            //t.AxisZ.z += Math.Cos(a.x);
+
+            //t.AxisX.x += Math.Cos(a.y);
+            //t.AxisX.z += -Math.Sin(a.y);
+            //t.AxisZ.x += Math.Sin(a.y);
+            //t.AxisZ.z += Math.Cos(a.y);
+
+            //t.AxisX.x += Math.Cos(a.z);
+            //t.AxisX.y += Math.Sin(a.z);
+            //t.AxisY.x += -Math.Sin(a.z);
+            //t.AxisY.y += Math.Cos(a.z);
+
+            //t.AxisX.x = _scry.Cos * _scrz.Cos;
+            //t.AxisX.y = _scry.Cos * _scrz.Sin;
+            //t.AxisX.z = -_scry.Sin;
+
+            //t.AxisY.x = _scrx.Sin * _scry.Sin * _scrz.Cos - _scrx.Cos * _scrz.Sin;
+            //t.AxisY.y = _scrx.Sin * _scry.Sin * _scrz.Sin + _scrx.Cos * _scrz.Cos;
+            //t.AxisY.z = _scrx.Sin * _scry.Cos;
+
+            //t.AxisZ.x = _scrx.Cos * _scry.Sin * _scrz.Cos + _scrx.Sin * _scrz.Sin;
+            //t.AxisZ.y = _scrx.Cos * _scry.Sin * _scrz.Sin - _scrx.Sin * _scrz.Cos;
+            //t.AxisZ.z = _scrx.Cos * _scry.Cos;
+            return t.RotateZ(a.z) * t.RotateX(a.x) * t.RotateY(a.y);
         }
 
         private TMatrix RotateX(TMatrix t, float a)
@@ -722,7 +757,7 @@ namespace Utubz
             return t;
         }
 
-        internal void ModifyProjection(float fov, float aspect, float near, float far, float scale)
+        internal void ModifyPerspective(float fov, float aspect, float near, float far, float scale)
         {
             // C++
             // T const tanHalfFovy = tan(fovy / static_cast<T>(2));
@@ -730,9 +765,9 @@ namespace Utubz
             // mat < 4, 4, T, defaultp > Result(static_cast<T>(0));
             // Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFovy);
             // Result[1][1] = static_cast<T>(1) / (tanHalfFovy);
-            // Result[2][2] = zFar / (zNear - zFar);
+            // Result[2][2] = -(zFar + zNear) / (zFar - zNear);
             // Result[2][3] = -static_cast<T>(1);
-            // Result[3][2] = -(zFar * zNear) / (zFar - zNear);
+            // Result[3][2] = -(static_cast<T>(2) * zFar * zNear) / (zFar - zNear);
             // return Result;
 
             if (fov < Math.Epsilon)
@@ -745,20 +780,20 @@ namespace Utubz
             AxisW = Vector3.Zero;
             Clip = 0f;
 
-            _xylen = 1f / Math.Tan(fov * 0.5f);
-            AxisX.x = aspect * _xylen;
-            AxisY.y = _xylen;
-            AxisZ.z = far / (near - far);
-            Position.z = -(far * near) / (far - near);
+            _xylen = Math.Tan(fov * 0.5f);
+            AxisX.x = 1f / (aspect * _xylen);
+            AxisY.y = 1f / _xylen;
+            AxisZ.z = (near + far) / (near - far);
             AxisW.z = -1f;
+            Position.z = (2f * near * far) / (near - far);
         }
 
-        internal void ModifyOrtho(float size, float aspect, float near, float far)
+        internal void ModifyOrthographic(float size, float aspect, float near, float far)
         {
             if (size < Math.Epsilon)
                 throw new TMatrixFovLessThanEqualToZeroException();
 
-            AxisX.x = 2f / size * aspect;
+            AxisX.x = 2f / (size * aspect);
             AxisY.y = 2f / size;
             AxisZ.z = -2f / (far - near);
             Position.x = 0f;
@@ -827,7 +862,12 @@ namespace Utubz
             AxisW.z = -_xyzscale.Dot(eye);
         }
 
-        internal void ModifyRotation(Vector3 eye, float x, float y)
+        internal static TMatrix GetXYRotation(float x, float y)
+        {
+            return Identity.ModifyRotation(Vector3.Zero, x, y);
+        }
+
+        internal TMatrix ModifyRotation(Vector3 eye, float x, float y)
         {
             /*
             mat4 FPSViewRH( vec3 eye, float pitch, float yaw )
@@ -870,6 +910,8 @@ namespace Utubz
             Position.x = -AxisX.Dot(eye);
             Position.y = -AxisY.Dot(eye);
             Position.z = -AxisZ.Dot(eye);
+
+            return this;
         }
 
         internal unsafe void ToArrayPtr(float* ptr)
@@ -944,7 +986,7 @@ namespace Utubz
             if (fov < Math.Epsilon)
                 throw new TMatrixFovLessThanEqualToZeroException();
 
-            ModifyProjection(fov, aspect, near, far, scale);
+            ModifyPerspective(fov, aspect, near, far, scale);
         }
 
         /// <summary>
@@ -973,7 +1015,7 @@ namespace Utubz
             if (size < Math.Epsilon)
                 throw new TMatrixFovLessThanEqualToZeroException();
 
-            ModifyOrtho(size, aspect, near, far);
+            ModifyOrthographic(size, aspect, near, far);
         }
 
         /// <summary>
@@ -1088,8 +1130,10 @@ namespace Utubz
             Clip = m33;
         }
 
+        private static readonly TMatrix zero = new TMatrix(0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f);
         private static readonly TMatrix identity = new TMatrix(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 1f);
         private static readonly TMatrix orthoIdentity = new TMatrix(1f, 0f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 0f, 1f);
+        public static TMatrix Zero => zero;
         public static TMatrix Identity => identity;
         public static TMatrix OrthographicIdentity => orthoIdentity;
     }

@@ -45,15 +45,13 @@ in vec2 vTexCoord;
 out vec4 uColor;
 out vec2 uTexCoord;
 
-uniform mat4 tModel;
-uniform mat4 tView;
-uniform mat4 tProjection;
+uniform mat4 mvp;
 
 void main()
 {
-    uColor = vColor;
     uTexCoord = vTexCoord;
-    gl_Position = tProjection * tView * tModel * vec4(vPosition, 1.0);
+    gl_Position = mvp * vec4(vPosition, 1.0);
+    uColor = vec4((gl_Position.x + 1.0) / 2.0, (gl_Position.y + 1.0) / 2.0, (gl_Position.z + 1.0) / 2.0, 1.0);
 }";
         internal const string DebugFragmentString = @"#version 460
 in vec4 uColor;
@@ -65,7 +63,7 @@ out vec4 fColor;
 
 void main()
 {
-    fColor = texture(uTexture, uTexCoord);
+    fColor = uColor;
 }";
 
         private uint vsh;

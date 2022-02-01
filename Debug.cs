@@ -106,6 +106,21 @@ namespace Utubz
             writer.Write(e);
         }
 
+        public static void Log(object obj)
+            => Log(obj.ToString());
+
+        public static void LogInfo(object obj)
+            => LogInfo(obj.ToString());
+
+        public static void LogWarn(object obj)
+            => LogWarn(obj.ToString());
+
+        public static void LogError(object obj)
+            => LogError(obj.ToString());
+
+        public static void LogVerbose(object obj)
+            => LogVerbose(obj.ToString());
+
         internal static void Save()
         {
             writer.Close();

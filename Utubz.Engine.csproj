@@ -13,4 +13,9 @@
     <None Remove="Native\**" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Flat\" />
+    <Folder Include="Physics\" />
+  </ItemGroup>
+
 </Project>

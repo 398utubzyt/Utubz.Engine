@@ -6,6 +6,12 @@ namespace Utubz
 {
     public class Scene : Object, IEquatable<Scene>
     {
+        public enum SceneMode
+        {
+            Default,
+            Flat
+        }
+
         public static Scene Empty(string name, Color background) => new Scene(name, background);
 
         private List<Entity> e;
@@ -16,8 +22,18 @@ namespace Utubz
 
         internal IEnumerable<Renderer> GetRenderers() => r;
 
+        /// <summary>
+        /// The name of the <see cref="Scene"/>.
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// The background clear <see cref="Color"/>.
+        /// </summary>
         public Color Background { get; set; }
+        /// <summary>
+        /// The type of camera to automatically create.
+        /// </summary>
+        public SceneMode Mode { get; set; }
         public Window Window => w;
         public int Index => bi;
 
@@ -37,6 +53,16 @@ namespace Utubz
             }
 
             return null;
+        }
+
+        internal void ReorderEntities()
+        {
+            e.Sort((a, b) => { return b.order - a.order; });
+        }
+
+        public int GetEntityIndex(Entity entity)
+        {
+            return e.IndexOf(entity);
         }
 
         internal int Add(Entity entity)

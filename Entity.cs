@@ -9,6 +9,7 @@ namespace Utubz
     {
         internal static Entity currentAddTo;
         private List<Component> com;
+        internal int order;
 
         /// <summary>
         /// The <see cref="Utubz.Scene"/> in which the <see cref="Entity"/> is located in.
@@ -17,7 +18,7 @@ namespace Utubz
         /// <summary>
         /// The <see cref="Entity"/>'s <see cref="Utubz.Scene"/> index which can be used to find it later.
         /// </summary>
-        public int Index { get; }
+        public int Index => Scene.GetEntityIndex(this);
         /// <summary>
         /// The name of the <see cref="Entity"/>.
         /// </summary>
@@ -30,6 +31,10 @@ namespace Utubz
         /// The <see cref="Utubz.Transform"/> of the <see cref="Entity"/>.
         /// </summary>
         public EntityTransform Transform { get; }
+        /// <summary>
+        /// The execution priority of the <see cref="Entity"/>. The higher the priority, the sooner it's updated.
+        /// </summary>
+        public int Priority { get => order; set { order = value; Scene.ReorderEntities(); } }
 
         /// <summary>
         /// Gets the first <see cref="Component"/> of type <typeparamref name="T"/>.
@@ -139,7 +144,7 @@ namespace Utubz
             Enabled = true;
             Transform = new EntityTransform(this);
 
-            Index = scene.Add(this);
+            scene.Add(this);
         }
 
         public Entity(Scene scene, string name)
@@ -151,7 +156,7 @@ namespace Utubz
             Enabled = true;
             Transform = new EntityTransform(this);
 
-            Index = scene.Add(this);
+            scene.Add(this);
         }
 
         public Entity(Scene scene, string name, params Type[] components)
@@ -163,7 +168,7 @@ namespace Utubz
             Enabled = true;
             Transform = new EntityTransform(this);
 
-            Index = scene.Add(this);
+            scene.Add(this);
 
             foreach (Type t in components)
             {

@@ -17,11 +17,11 @@
 
         internal void PrepareForRender()
         {
-            ml = Transform.Transform.WorldToLocal;
+            ml = TMatrix.Rotation(-Transform.Rotation) * TMatrix.Translation(-Transform.Position);
             if (Orthographic)
-                mp.ModifyOrtho(Size, Scene.Window.Viewport.InverseRatio, ClipNear, ClipFar);
+                mp.ModifyOrthographic(Size, Scene.Window.Viewport.Ratio, ClipNear, ClipFar);
             else
-                mp.ModifyProjection(Fov, Scene.Window.Viewport.InverseRatio, ClipNear, ClipFar, 1f);
+                mp.ModifyPerspective(Fov, Scene.Window.Viewport.Ratio, ClipNear, ClipFar, 1f);
         }
 
         protected override void Init()
@@ -30,8 +30,8 @@
             ClipNear = 0.1f;
             ClipFar = 100f;
             Size = 5f;
-            Orthographic = false;
-
+            Orthographic = Scene.Mode == Scene.SceneMode.Flat;
+            
             ml = TMatrix.Identity;
             mp = TMatrix.OrthographicIdentity;
             Scene.Add(this);

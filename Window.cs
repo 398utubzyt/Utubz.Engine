@@ -22,6 +22,7 @@ namespace Utubz
         private string title;
         private bool vsync;
         private bool minside;
+        private int mmode;
 
         private InputContext input;
         private TimeContext time;
@@ -61,9 +62,17 @@ namespace Utubz
         /// </summary>
         public bool Vsync { get { return vsync; } set { vsync = value; glfw3.GlfwSwapInterval(vsync ? 1 : 0); } }
         /// <summary>
-        /// Gets if the mouse cursor is hovering over the window;
+        /// Gets if the mouse cursor is hovering over the <see cref="Window"/>.
         /// </summary>
         public bool CursorHovering { get { return minside; } }
+        /// <summary>
+        /// Determines if the cursor will be hidden when it enters the <see cref="Window"/>.
+        /// </summary>
+        public bool HideCursor { get { return mmode != 0; } set { mmode = value ? 1 : 0; glfw3.GlfwSetInputMode(win, 0x00033001, value ? 0x00034002 : 0x00034001); } }
+        /// <summary>
+        /// Determines if the cursor will be hidden and confined to the <see cref="Window"/> bounds upon entering.
+        /// </summary>
+        public bool RestrictCursor { get { return mmode == 2; } set { mmode = value ? 1 : 0; glfw3.GlfwSetInputMode(win, 0x00033001, value ? 0x00034003 : 0x00034001); } }
 
         /// <summary>
         /// Gets if this <see cref="Window"/> is the first <see cref="Window"/> created.
@@ -275,42 +284,54 @@ namespace Utubz
 
         #endregion
 
+        #region Scene Loading
+
+        public void LoadScene(Scene scene)
+        {
+            if (NotNull(this.scene))
+                this.scene.Destroy();
+
+            this.scene = scene;
+            this.scene.w = this;
+            this.scene.Begin();
+        }
+
+        public void LoadScene(Type scene)
+            => LoadScene((Scene)Activator.CreateInstance(scene));
+
+        public void LoadScene<T>() where T : Scene
+            => LoadScene(Activator.CreateInstance<T>());
+
+        #endregion
+
         #region Initialization
 
         public Window(string title, int width, int height, bool vsync)
         {
-            Setup(title, width, height, vsync);
-            scene = Scene.Empty("Empty", Color.Black);
-            scene.w = this;
-            scene.Begin();
+            Setup(title, width, height, vsync, Scene.Empty("Empty", Color.Black));
 
             Application.Main.windows.Add(this);
         }
 
         public Window(string title, int width, int height, bool vsync, Scene scene)
         {
-            Setup(title, width, height, vsync);
-            this.scene = scene;
-            this.scene.w = this;
-            this.scene.Begin();
+            Setup(title, width, height, vsync, scene);
 
             Application.Main.windows.Add(this);
         }
 
-        internal Window(string title, int width, int height, bool vsync, Type scene)
+        public Window(string title, int width, int height, bool vsync, Type scene)
         {
-            Setup(title, width, height, vsync);
-            this.scene = (Scene)Activator.CreateInstance(scene);
-            this.scene.w = this;
-            this.scene.Begin();
+            Setup(title, width, height, vsync, (Scene)Activator.CreateInstance(scene));
 
             Application.Main.windows.Add(this);
         }
 
-        private unsafe void Setup(string title, int width, int height, bool vsync)
+        private unsafe void Setup(string title, int width, int height, bool vsync, Scene scene)
         {
             CreateSelf(width, height, title, vsync);
             CreateCallbacks();
+            LoadScene(scene);
         }
 
         private void CreateSelf(int width, int height, string title, bool vsync)
