@@ -3,11 +3,13 @@
 namespace Utubz.Flat
 {
     /// <summary>
-    /// Renders a sprite onto a quad.
+    /// Renders a sprite from a spritesheet onto a quad.
     /// </summary>
-    public sealed unsafe class SpriteRenderer : Renderer
+    public sealed unsafe class SpritesheetRenderer : Renderer
     {
-        public Sprite Sprite { get; set; }
+        public Spritesheet Sheet { get; set; }
+        public int Index { get; set; }
+        public Sprite Sprite => Sheet.Get(Index);
 
         private class SRData : Object
         {
@@ -210,7 +212,7 @@ namespace Utubz.Flat
 
             if (Null(Sprite))
                 //Texture = Texture.Color(64, 64, Color.White);
-                Sprite = new Sprite(Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png"), Vector2.Zero, Vector2.One);
+                Sheet = new Spritesheet(Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png"), Vector2.Zero, Vector2.One, Vector2.Zero);
 
             data = new SRData();
 
