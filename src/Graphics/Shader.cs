@@ -9,9 +9,9 @@ namespace Utubz.Graphics
     public sealed class Shader : Object
     {
         internal const string DefaultVertexString = @"#version 460
-in vec3 vPosition;
-in vec4 vColor;
-in vec2 vTexCoord;
+layout (location = 0) in vec3 vPosition;
+layout (location = 1) in vec4 vColor;
+layout (location = 2) in vec2 vTexCoord;
 
 out vec4 uColor;
 out vec2 uTexCoord;
@@ -34,13 +34,13 @@ out vec4 fColor;
 
 void main()
 {
-    fColor = texture(uTexture, uTexCoord);
+    fColor = texture(uTexture, uTexCoord) * uColor;
 }";
 
         internal const string DebugVertexString = @"#version 460
-in vec3 vPosition;
-in vec4 vColor;
-in vec2 vTexCoord;
+layout (location = 0) in vec3 vPosition;
+layout (location = 1) in vec4 vColor;
+layout (location = 2) in vec2 vTexCoord;
 
 out vec4 uColor;
 out vec2 uTexCoord;

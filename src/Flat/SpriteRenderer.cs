@@ -1,18 +1,15 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using Utubz.Graphics;
 
-using Utubz.Internal.Native.Glad;
-
-namespace Utubz.Graphics
+namespace Utubz.Flat
 {
     /// <summary>
-    /// Renders a quad.
+    /// Renders a sprite onto a quad.
     /// </summary>
-    public sealed unsafe class RectRenderer : Renderer
+    public sealed unsafe class SpriteRenderer : Renderer
     {
-        private Texture Texture { get; set; }
+        public Sprite Sprite { get; set; }
 
-        private class RRData : Object
+        private class SRData : Object
         {
             public float[] data;
             public uint[] indices;
@@ -88,6 +85,24 @@ namespace Utubz.Graphics
                     texattr.Set(dbuf, 2, 2, 28);
             }
 
+            public void SetTexCoords(Rect v)
+            {
+                data[28] = v.Size.x;
+                data[29] = v.Size.y;
+                data[30] = v.Size.x;
+                data[31] = v.Position.y;
+                data[32] = v.Position.x;
+                data[33] = v.Position.y;
+                data[34] = v.Position.x;
+                data[35] = v.Size.y;
+
+                if (NotNull(dbuf))
+                    dbuf.Set(data);
+
+                if (NotNull(texattr))
+                    texattr.Set(dbuf, 2, 2, 28);
+            }
+
             public void SetIndices(uint i00, uint i01, uint i02, uint i10, uint i11, uint i12)
             {
                 indices[0] = i00;
@@ -96,7 +111,7 @@ namespace Utubz.Graphics
                 indices[3] = i10;
                 indices[4] = i11;
                 indices[5] = i12;
-
+                
                 if (NotNull(ibuf))
                     ibuf.Set(indices);
             }
@@ -137,12 +152,19 @@ namespace Utubz.Graphics
                 GL.DrawTriangles(dbuf, ibuf, aarr);
             }
 
+            public void Draw(Sprite spr)
+            {
+                SetTexCoords(spr.Bounds);
+                GL.UseTexture(spr.Texture, 0);
+                GL.DrawTriangles(dbuf, ibuf, aarr);
+            }
+
             public void SetMvp(TMatrix model, TMatrix view, TMatrix projection)
             {
                 mvpunif.Set(projection * view * model);
             }
 
-            public RRData()
+            public SRData()
             {
                 data = new float[36];
                 indices = new uint[6];
@@ -160,8 +182,8 @@ namespace Utubz.Graphics
             }
         }
 
-        private RRData data;
-
+        private SRData data;
+        
         private void UpdateMatrix(Camera cam)
         {
             data.SetMvp(Transform.Transform.LocalToWorld, cam.ViewMatrix, cam.ProjectionMatrix);
@@ -170,14 +192,14 @@ namespace Utubz.Graphics
         private void SetConstantData()
         {
             data.SetVertices(
-                0.5f, 0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                -0.5f, 0.5f, 0f
+                0.5f, 0.5f * Sprite.Texture.HwRatio, 0f, 
+                0.5f, -0.5f * Sprite.Texture.HwRatio, 0f, 
+                -0.5f, -0.5f * Sprite.Texture.HwRatio, 0f, 
+                -0.5f, 0.5f * Sprite.Texture.HwRatio, 0f
             );
             data.SetColor(1f, 1f, 1f, 1f);
             data.SetIndices(0u, 1u, 2u, 2u, 3u, 0u);
-            data.SetTexCoords(1f, 1f, 1f, 0.0f, 0.0f, 0.0f, 0.0f, 1f);
+            data.SetTexCoords(Sprite.Bounds);
         }
 
         protected override void Begin(Camera cam)
@@ -185,11 +207,11 @@ namespace Utubz.Graphics
             if (Null(Shader))
                 Shader = Shader.Default;
 
-            if (Null(Texture))
-                Texture = Texture.Color(64, 64, Color.White);
-                //Texture = Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png");
+            if (Null(Sprite))
+                //Texture = Texture.Color(64, 64, Color.White);
+                Sprite = new Sprite(Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png"), Vector2.Zero, Vector2.One);
 
-            data = new RRData();
+            data = new SRData();
 
             SetConstantData();
 
@@ -206,7 +228,7 @@ namespace Utubz.Graphics
         protected override void Render(Camera cam)
         {
             UpdateMatrix(cam);
-            data.Draw(Texture);
+            data.Draw(Sprite);
         }
     }
 }

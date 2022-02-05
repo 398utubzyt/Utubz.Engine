@@ -101,13 +101,32 @@ namespace Utubz.Graphics
         {
             public string Name { get; }
             public uint Location { get; }
-
+            #region Set
+            public void Set(float x)
+            {
+                glad.GLVertexAttrib1f(Location, x);
+            }
+            public void Set(Vector2 x)
+            {
+                glad.GLVertexAttrib2f(Location, x.x, x.y);
+            }
+            public void Set(Vector3 x)
+            {
+                glad.GLVertexAttrib3f(Location, x.x, x.y, x.z);
+            }
+            public void Set(Color x)
+            {
+                glad.GLVertexAttrib4f(Location, x.r, x.g, x.b, x.a);
+            }
 
             public void Set(Buffer buffer, int size, int step, int start)
             {
                 buffer.Bind();
+                Disable();
                 glad.GLVertexAttribPointer(Location, size, buffer.type, 0, step * buffer.size, (IntPtr)(start * buffer.size));
+                Enable();
             }
+            #endregion
 
             public void Enable()
             {
@@ -244,7 +263,7 @@ namespace Utubz.Graphics
 
         public static void Bind(Texture texture)
         {
-            glad.GLBindTexture(glad.GL_TEXTURE_2D, texture.TextureId);
+            glad.GLBindTexture(0x0DE1, texture.TextureId);
         }
 
         public static void UseTexture(Texture texture, uint index)
@@ -256,8 +275,8 @@ namespace Utubz.Graphics
         public static void DrawTriangles(ArrayBuffer vbo, ElementArrayBuffer ebo, VertexArray vao)
         {
             vbo.Bind();
-            vao.Bind();
             ebo.Bind();
+            vao.Bind();
             glad.GLDrawElements(glad.GL_TRIANGLES, ebo.len, ebo.type, (IntPtr)0);
         }
 

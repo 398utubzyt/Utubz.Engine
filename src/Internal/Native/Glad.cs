@@ -512,16 +512,16 @@ namespace Utubz.Internal.Native.Glad
     internal unsafe delegate void PFNGLVERTEXATTRIB1DVPROC(uint index, double* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB1FPROC(uint index, int x);
+    internal unsafe delegate void PFNGLVERTEXATTRIB1FPROC(uint index, float x);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB1FVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB1FVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB1SPROC(uint index, int x);
+    internal unsafe delegate void PFNGLVERTEXATTRIB1SPROC(uint index, float x);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB1SVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB1SVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void PFNGLVERTEXATTRIB2DPROC(uint index, double x, double y);
@@ -530,16 +530,16 @@ namespace Utubz.Internal.Native.Glad
     internal unsafe delegate void PFNGLVERTEXATTRIB2DVPROC(uint index, double* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB2FPROC(uint index, int x, int y);
+    internal unsafe delegate void PFNGLVERTEXATTRIB2FPROC(uint index, float x, float y);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB2FVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB2FVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB2SPROC(uint index, int x, int y);
+    internal unsafe delegate void PFNGLVERTEXATTRIB2SPROC(uint index, float x, float y);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB2SVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB2SVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void PFNGLVERTEXATTRIB3DPROC(uint index, double x, double y, double z);
@@ -548,16 +548,16 @@ namespace Utubz.Internal.Native.Glad
     internal unsafe delegate void PFNGLVERTEXATTRIB3DVPROC(uint index, double* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB3FPROC(uint index, int x, int y, int z);
+    internal unsafe delegate void PFNGLVERTEXATTRIB3FPROC(uint index, float x, float y, float z);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB3FVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB3FVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB3SPROC(uint index, int x, int y, int z);
+    internal unsafe delegate void PFNGLVERTEXATTRIB3SPROC(uint index, float x, float y, float z);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB3SVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB3SVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void PFNGLVERTEXATTRIB4NBVPROC(uint index, int* v);
@@ -590,10 +590,10 @@ namespace Utubz.Internal.Native.Glad
     internal unsafe delegate void PFNGLVERTEXATTRIB4DVPROC(uint index, double* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB4FPROC(uint index, int x, int y, int z, int w);
+    internal unsafe delegate void PFNGLVERTEXATTRIB4FPROC(uint index, float x, float y, float z, float w);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate void PFNGLVERTEXATTRIB4FVPROC(uint index, int* v);
+    internal unsafe delegate void PFNGLVERTEXATTRIB4FVPROC(uint index, float* v);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void PFNGLVERTEXATTRIB4IVPROC(uint index, int* v);

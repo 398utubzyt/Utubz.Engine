@@ -130,6 +130,26 @@ namespace Utubz
         }
 
         /// <summary>
+        /// Returns the vector shifted on the x-axis by <paramref name="shift"/>.
+        /// </summary>
+        /// <param name="shift">The amount to shift by.</param>
+        /// <returns>The shifted vector.</returns>
+        public Vector2 ShiftHorizontal(float shift)
+        {
+            return new Vector2(x + shift, y);
+        }
+
+        /// <summary>
+        /// Returns the vector shifted on the y-axis by <paramref name="shift"/>.
+        /// </summary>
+        /// <param name="shift">The amount to shift by.</param>
+        /// <returns>The shifted vector.</returns>
+        public Vector2 ShiftVertical(float shift)
+        {
+            return new Vector2(x, y + shift);
+        }
+
+        /// <summary>
         /// Returns the vector "bounced off" from a plane defined by the given normal.
         /// </summary>
         /// <param name="normal">The normal vector defining the plane to bounce off. Must be normalized.</param>

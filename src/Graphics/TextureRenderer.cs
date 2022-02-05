@@ -6,13 +6,13 @@ using Utubz.Internal.Native.Glad;
 namespace Utubz.Graphics
 {
     /// <summary>
-    /// Renders a quad.
+    /// Renders a texture onto a quad.
     /// </summary>
-    public sealed unsafe class RectRenderer : Renderer
+    public sealed unsafe class TextureRenderer : Renderer
     {
-        private Texture Texture { get; set; }
+        public Texture Texture { get; set; }
 
-        private class RRData : Object
+        private class TRData : Object
         {
             public float[] data;
             public uint[] indices;
@@ -142,7 +142,7 @@ namespace Utubz.Graphics
                 mvpunif.Set(projection * view * model);
             }
 
-            public RRData()
+            public TRData()
             {
                 data = new float[36];
                 indices = new uint[6];
@@ -160,8 +160,8 @@ namespace Utubz.Graphics
             }
         }
 
-        private RRData data;
-
+        private TRData data;
+        
         private void UpdateMatrix(Camera cam)
         {
             data.SetMvp(Transform.Transform.LocalToWorld, cam.ViewMatrix, cam.ProjectionMatrix);
@@ -170,10 +170,10 @@ namespace Utubz.Graphics
         private void SetConstantData()
         {
             data.SetVertices(
-                0.5f, 0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                -0.5f, 0.5f, 0f
+                0.5f, 0.5f * Texture.HwRatio, 0f,
+                0.5f, -0.5f * Texture.HwRatio, 0f,
+                -0.5f, -0.5f * Texture.HwRatio, 0f,
+                -0.5f, 0.5f * Texture.HwRatio, 0f
             );
             data.SetColor(1f, 1f, 1f, 1f);
             data.SetIndices(0u, 1u, 2u, 2u, 3u, 0u);
@@ -186,10 +186,10 @@ namespace Utubz.Graphics
                 Shader = Shader.Default;
 
             if (Null(Texture))
-                Texture = Texture.Color(64, 64, Color.White);
-                //Texture = Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png");
+                //Texture = Texture.Color(64, 64, Color.White);
+                Texture = Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png");
 
-            data = new RRData();
+            data = new TRData();
 
             SetConstantData();
 
