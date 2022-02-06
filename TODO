@@ -1,8 +1,5 @@
 - Create basic collision detection and resolving in Utubz.Physics namespace
-- Create BASS bindings in Utubz.Internal.Native
-- Implement the Utubz.Audio namespace using BASS
 - Implement the Utubz.Internal.Platforms namespace for a more customizable backend
-- Add Utubz.Flat for 2D functionality
 - Create SDL2 bindings in Utubz.Internal.Native
 - Create SDL2 backend as an alternative to GLFW
 - Fix the perspective projection transformations
