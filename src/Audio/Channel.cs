@@ -12,7 +12,12 @@ namespace Utubz.Audio
         public float Position { get => (float)bass.BASS_ChannelBytes2Seconds(handle, bass.BASS_ChannelGetPosition(handle, 2)); }
         public float Volume { get { float x = 0f; bass.BASS_ChannelGetAttribute(handle, 2, ref x); return x; } set { bass.BASS_ChannelSetAttribute(handle, 2, value); } }
         public float Pitch { get { float x = 0f; bass.BASS_ChannelGetAttribute(handle, 1, ref x); return x / Frequency; } set { bass.BASS_ChannelSetAttribute(handle, 1, value * Frequency); } }
+        // TODO: Get the speed to actually work lmao
+        public float Speed { get { float x = 0f; bass.BASS_ChannelGetAttribute(handle, 65537, ref x); return (x + 100f) / 100f; } set { bass.BASS_ChannelSetAttribute(handle, 65537, value * 100f - 100f); } }
         public bool Loop { get { return (bass.BASS_ChannelFlags(handle, 0, 0) & 4) == 4; } set { bass.BASS_ChannelFlags(handle, value ? 4u : 0u, 4); } }
+
+        public bool Playing { get => bass.BASS_ChannelIsActive(handle) != 0; }
+        public bool Paused { get => bass.BASS_ChannelIsActive(handle) == 3; }
 
         public void Play()
         {
