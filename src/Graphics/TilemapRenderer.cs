@@ -1,7 +1,5 @@
 ﻿/*
-using Utubz.Graphics;
-
-namespace Utubz.Flat
+namespace Utubz.Graphics
 {
     /// <summary>
     /// Renders a sprite from a spritesheet onto a quad.

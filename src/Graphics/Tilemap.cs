@@ -1,6 +1,6 @@
 ﻿using Utubz.Graphics;
 
-namespace Utubz.Flat
+namespace Utubz.Graphics
 {
     public sealed class Tilemap : Object
     {
