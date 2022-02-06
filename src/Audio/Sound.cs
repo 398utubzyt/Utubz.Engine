@@ -15,7 +15,7 @@ namespace Utubz.Audio
             return new Sound(bass.BASS_StreamCreateFile(0, file.Replace('\\', '/'), 0, 0, 0));
         }
 
-        protected override void Clean()
+        protected override void Close()
         {
             bass.BASS_StreamFree(handle);
         }

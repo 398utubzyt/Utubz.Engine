@@ -39,7 +39,14 @@ namespace Utubz.Audio
             bass.BASS_ChannelPause(handle);
         }
 
-        protected abstract override void Clean();
+        protected override void Clean()
+        {
+            Close();
+
+            info.Dispose();
+        }
+
+        protected abstract void Close();
 
         private class AudioLoadException : System.Exception
         {
