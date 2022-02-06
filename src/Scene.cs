@@ -159,6 +159,8 @@ namespace Utubz
 
         protected sealed override void Clean()
         {
+            Quit();
+
             foreach (Entity e in e)
             {
                 e.Destroy();
@@ -167,6 +169,8 @@ namespace Utubz
 
         internal void Run()
         {
+            Update();
+
             foreach (Entity e in e)
             {
                 e.Run();
