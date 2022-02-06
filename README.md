@@ -1,4 +1,4 @@
-### NOTICE: Utubz Engine is still in active development, and has plenty of features missing!
+### NOTICE: Utubz Engine is still in active development. Check out the TODO for a list of planned features!
 
 # Utubz.Engine
  A C# framework for making games.
