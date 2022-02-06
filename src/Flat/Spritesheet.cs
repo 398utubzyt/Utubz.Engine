@@ -4,8 +4,7 @@ namespace Utubz.Flat
 {
     public sealed class Spritesheet : Object
     {
-        private Sprite cache;
-        private Vector2 posb;
+        private Sprite[] cache;
 
         /// <summary>
         /// Tells the <see cref="Spritesheet"/> how it should be read.
@@ -44,13 +43,31 @@ namespace Utubz.Flat
         public ReadMode Mode;
 
         /// <summary>
-        /// Generates a <see cref="Sprite"/> based on the <see cref="Spritesheet"/>'s properties.
+        /// Gets a <see cref="Sprite"/> based on the <see cref="Spritesheet"/>'s properties.
         /// </summary>
         /// <param name="index">The index of the <see cref="Sprite"/>.</param>
-        /// <returns>A new <see cref="Sprite"/> based on the <see cref="Spritesheet"/>'s current properties.</returns>
+        /// <returns>A <see cref="Sprite"/> based on the <see cref="Spritesheet"/>'s current properties.</returns>
         public Sprite Get(int index)
         {
-            posb = Mode switch
+            if (NotNull(cache[index]))
+            {
+                
+                return cache[index];
+            } else
+            {
+                cache[index] = New(index);
+                return cache[index];
+            }
+        }
+
+        private Sprite New(int index)
+        {
+            return new Sprite(Texture, IndexToPosition(index) / Texture.Size, Size / Texture.Size);
+        }
+
+        private Vector2 IndexToPosition(int index)
+        {
+            return Mode switch
             {
                 ReadMode.Column => Offset
                 .ShiftVertical(Math.Loop((Size.y + Padding.y) * index, Texture.Height))
@@ -60,13 +77,22 @@ namespace Utubz.Flat
                 .ShiftHorizontal(Math.Loop((Size.x + Padding.x) * index, Texture.Width))
                 .ShiftVertical(Math.Floor((Size.x + Padding.x) * index / Texture.Width) * (Size.y + Padding.y))
             };
+        }
 
-            if (NotNull(cache) && cache.Position == posb && cache.Size == Size)
-                return cache;
+        internal void Retry()
+        {
+            System.Array.Clear(cache);
+            System.Array.Resize(ref cache, CacheSize());
+        }
 
-            cache.Destroy();
-            cache = new Sprite(Texture, posb, Size);
-            return cache;
+        private int CacheSize()
+        {
+            return (int)(((Texture.Width - Offset.x) / (Size.x + Padding.x)) * ((Texture.Height - Offset.y) / (Size.y + Padding.y)));
+        }
+
+        protected override void Clean()
+        {
+            System.Array.Clear(cache);
         }
 
         public Spritesheet(Texture texture, Vector2 offset, Vector2 size, Vector2 padding, ReadMode mode = ReadMode.Row)
@@ -76,6 +102,8 @@ namespace Utubz.Flat
             Size = size;
             Padding = padding;
             Mode = mode;
+
+            cache = new Sprite[CacheSize()];
         }
     }
 }

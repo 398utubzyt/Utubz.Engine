@@ -1,6 +1,7 @@
 ﻿using Utubz.Internal.Native.Glad;
 using Utubz.Internal.Native.Glfw;
 using Utubz.Internal.Native.Stb.Image;
+using Utubz.Internal.Native.Bass;
 
 using System;
 
@@ -31,10 +32,15 @@ namespace Utubz.Internal.Native
             }
 
             stb_image.StbiSetFlipVerticallyOnLoad(1);
+
+            if (bass.BASS_Init(-1, 44100, 0x4000, IntPtr.Zero, IntPtr.Zero) == 0)
+                Throw("bass", "Initialization error");
         }
 
         public static void QuitNativeLibraries()
         {
+            bass.BASS_Stop();
+            bass.BASS_Free();
             glfw3.GlfwTerminate();
         }
     }

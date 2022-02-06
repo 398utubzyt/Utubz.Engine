@@ -7,11 +7,12 @@ namespace Utubz.Flat
     /// </summary>
     public sealed unsafe class SpritesheetRenderer : Renderer
     {
-        public Spritesheet Sheet { get; set; }
-        public int Index { get; set; }
-        public Sprite Sprite => Sheet.Get(Index);
+        private Spritesheet sheet;
+        private int index;
 
-        
+        public Spritesheet Sheet { get { sheet.Retry(); return sheet; } set { sheet = value; sheet.Retry(); } }
+        public int Index { get => index; set { index = value; sheet.Retry(); } }
+        public Sprite Sprite => Sheet.Get(Index);
 
         private R2DContext data;
         
@@ -38,9 +39,9 @@ namespace Utubz.Flat
             if (Null(Shader))
                 Shader = Shader.Default;
 
-            if (Null(Sprite))
+            if (Null(sheet))
                 //Texture = Texture.Color(64, 64, Color.White);
-                Sheet = new Spritesheet(Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-npc.png"), Vector2.Zero, Vector2.One, Vector2.Zero);
+                sheet = new Spritesheet(Texture.FromFile($"{Application.ProcessPath}/resources/graphics/test-sheet.png"), Vector2.Zero, new Vector2(32f, 64f), Vector2.Zero);
 
             data = new R2DContext();
 

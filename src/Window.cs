@@ -104,6 +104,11 @@ namespace Utubz
             return scr;
         }
 
+        internal IntPtr GetHwnd()
+        {
+            return glfw3.GlfwGetWindowUserPointer(win);
+        }
+
         #endregion
 
         #region Callback Delagates (to avoid GC)

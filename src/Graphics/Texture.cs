@@ -9,7 +9,8 @@ namespace Utubz.Graphics
 {
     public sealed unsafe class Texture : Object
     {
-        private int w, h, n;
+        private int n;
+        private Vector2 s;
         private byte* data;
         private uint t;
 
@@ -20,8 +21,7 @@ namespace Utubz.Graphics
 
             Texture t = new Texture();
 
-            t.w = width;
-            t.h = height;
+            t.s = new Vector2(width, height);
 
             t.data = (byte*)Marshal.AllocHGlobal(width * height * 4);
 
@@ -40,8 +40,9 @@ namespace Utubz.Graphics
         }
 
         public uint TextureId => t;
-        public int Width => w;
-        public int Height => h;
+        public Vector2 Size => s;
+        public int Width => (int)s.x;
+        public int Height => (int)s.y;
         public int Depth => n;
         public float HwRatio => Height / Width;
 
@@ -52,7 +53,9 @@ namespace Utubz.Graphics
 
             Texture t = new Texture();
 
-            t.data = stb_image.StbiLoad(path, ref t.w, ref t.h, ref t.n, 4);
+            int _w = 0, _h = 0;
+            t.data = stb_image.StbiLoad(path, ref _w, ref _h, ref t.n, 4);
+            t.s = new Vector2(_w, _h);
             t.Bind();
             stb_image.StbiImageFree((IntPtr)t.data);
 
@@ -75,14 +78,13 @@ namespace Utubz.Graphics
             glad.GLTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_WRAP_T, glad.GL_REPEAT);
             glad.GLTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_MIN_FILTER, glad.GL_NEAREST_MIPMAP_NEAREST);
             glad.GLTexParameteri(glad.GL_TEXTURE_2D, glad.GL_TEXTURE_MAG_FILTER, glad.GL_NEAREST);
-            glad.GLTexImage2D(glad.GL_TEXTURE_2D, 0, glad.GL_RGBA, w, h, 0, glad.GL_RGBA, glad.GL_UNSIGNED_BYTE, (IntPtr)data);
+            glad.GLTexImage2D(glad.GL_TEXTURE_2D, 0, glad.GL_RGBA, (int)s.x, (int)s.y, 0, glad.GL_RGBA, glad.GL_UNSIGNED_BYTE, (IntPtr)data);
             glad.GLGenerateMipmap(glad.GL_TEXTURE_2D);
         }
 
         private Texture()
         {
-            w = 0;
-            h = 0;
+            s = Vector2.Zero;
             n = 0;
             data = null;
         }
