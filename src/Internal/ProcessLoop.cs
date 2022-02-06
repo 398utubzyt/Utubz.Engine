@@ -72,6 +72,7 @@ namespace Utubz.Internal
 
         private void Quit()
         {
+            Utubz.Discord.Status.Quit();
             NativeUtil.QuitNativeLibraries();
 
             Debug.Save();
@@ -193,6 +194,8 @@ namespace Utubz.Internal
 
         private void UpdateAndRenderAll()
         {
+            Utubz.Discord.Status.Run();
+
             try
             {
                 foreach (Window win in windows)
