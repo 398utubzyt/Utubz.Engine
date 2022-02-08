@@ -1,4 +1,6 @@
 ﻿using Utubz.Graphics;
+using Utubz.Async;
+using Utubz.Physics;
 using Utubz.Internal.Native;
 using Utubz.Internal.Native.Glad;
 using Utubz.Internal.Native.Glfw;
@@ -6,7 +8,6 @@ using Utubz.Internal.Native.Glfw;
 using System;
 using System.Threading;
 using System.Collections.Concurrent;
-using Utubz.Async;
 
 namespace Utubz.Internal
 {
@@ -60,11 +61,10 @@ namespace Utubz.Internal
         private void Init()
         {
             NativeUtil.InitNativeLibraries();
+            Garbage.Init();
+            Phy2D.Init();
 
-            if (initScene != null)
-                new Window("cool", 1280, 720, false, initScene);
-            else
-                new Window("cool", 1280, 720, true);
+            Window.Create("cool", 0, 0, 1280, 720, false, initScene);
 
             if (Multithreaded)
                 RenderThread.Start();
@@ -73,6 +73,8 @@ namespace Utubz.Internal
         private void Quit()
         {
             Utubz.Discord.Status.Quit();
+            Phy2D.Quit();
+            Garbage.Quit();
             NativeUtil.QuitNativeLibraries();
 
             Debug.Save();
@@ -209,6 +211,8 @@ namespace Utubz.Internal
             {
                 Debug.Log(e);
             }
+
+            Garbage.Process();
         }
 
         public void Wait()

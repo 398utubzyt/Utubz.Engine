@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
+using Utubz.Internal;
+
 namespace Utubz
 {
     public class Object : IEquatable<Object>
@@ -39,12 +41,18 @@ namespace Utubz
 
         public void Destroy()
         {
+            Garbage.Register(this);
+        }
+
+        public void DestroyNow()
+        {
             if (destroyed)
                 return;
+            
+            destroyed = true;
 
             Clean();
 
-            destroyed = true;
             handle.Free();
             id = -1;
         }

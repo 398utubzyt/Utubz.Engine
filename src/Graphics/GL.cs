@@ -1,11 +1,51 @@
 ﻿using Utubz.Internal.Native.Glad;
 using System;
 using System.Runtime.InteropServices;
+using Utubz.Internal.Native;
 
 namespace Utubz.Graphics
 {
-    public static unsafe class GL
+    public static unsafe partial class GL
     {
+        #region Loading
+
+        private static bool loaded;
+
+        private class GLLoadingException : Exception
+        {
+            public GLLoadingException() : base("Unable to load GL for some reason.")
+            {
+
+            }
+        }
+
+        internal static void Load(GLLoadProc proc)
+        {
+            if (loaded)
+                return;
+
+            loaded = true;
+
+            if (glad.GladLoadGLLoader(proc) == 0)
+                throw new GLLoadingException();
+
+            glad.GLEnable(glad.GL_BLEND);
+            glad.GLEnable(glad.GL_DEPTH_TEST);
+            glad.GLBlendFunc(glad.GL_SRC_ALPHA, glad.GL_ONE_MINUS_SRC_ALPHA);
+
+            Debug.LogEngine(
+                System.Reflection.Assembly.GetExecutingAssembly().GetName(),
+                (string)UTF8Marshaller.marshaler.MarshalNativeToManaged((IntPtr)glad.GLGetString(glad.GL_VENDOR)),
+                (string)UTF8Marshaller.marshaler.MarshalNativeToManaged((IntPtr)glad.GLGetString(glad.GL_RENDERER))
+            );
+
+            // To initialize compile and init shaders on GL load
+            Shader.Default.Equals(loaded);
+            Shader.Debug.Equals(loaded);
+        }
+
+        #endregion
+
         #region Buffers
 
         public abstract class Buffer : Object

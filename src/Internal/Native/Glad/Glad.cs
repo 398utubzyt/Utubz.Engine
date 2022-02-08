@@ -14,7 +14,7 @@ using __IntPtr = global::System.IntPtr;
 namespace Utubz.Internal.Native.Glad
 {
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
-    internal unsafe delegate __IntPtr GLADloadproc([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utubz.Internal.Native.UTF8Marshaller))] string name);
+    internal unsafe delegate __IntPtr GLLoadProc([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utubz.Internal.Native.UTF8Marshaller))] string name);
 
     [SuppressUnmanagedCodeSecurity, UnmanagedFunctionPointer(__CallingConvention.Cdecl)]
     internal unsafe delegate void GLDEBUGPROC(uint source, uint type, uint id, uint severity, int length, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(Utubz.Internal.Native.UTF8Marshaller))] string message, __IntPtr userParam);
@@ -3815,7 +3815,7 @@ namespace Utubz.Internal.Native.Glad
             return __ret;
         }
 
-        public static int GladLoadGLLoader(global::Utubz.Internal.Native.Glad.GLADloadproc _0)
+        public static int GladLoadGLLoader(global::Utubz.Internal.Native.Glad.GLLoadProc _0)
         {
             var __arg0 = _0 == null ? global::System.IntPtr.Zero : Marshal.GetFunctionPointerForDelegate(_0);
             var __ret = __Internal.GladLoadGLLoader(__arg0);
