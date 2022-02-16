@@ -1,4 +1,5 @@
 ﻿using Utubz.Internal;
+using Utubz.Internal.Platforms;
 
 using System.IO;
 using System;
@@ -10,7 +11,9 @@ namespace Utubz
 
     public static class Application
     {
+        internal static Platform Platform;
         internal static ProcessLoop Main;
+        internal static int MainWinId;
         private static string baseDir = Path.GetDirectoryName(Environment.ProcessPath);
 
         public static string ProcessPath => baseDir;
@@ -31,7 +34,7 @@ namespace Utubz
             return MainWindow == window;
         }
 
-        public static Window MainWindow { get { Main.windows.TryPeek(out Window r); return r; } }
+        public static Window MainWindow { get { Main.windows.TryGetValue(MainWinId, out Window r); return r; } }
 
         public static void Close()
         {

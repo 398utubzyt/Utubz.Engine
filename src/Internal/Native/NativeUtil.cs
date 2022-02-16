@@ -24,13 +24,6 @@ namespace Utubz.Internal.Native
 
         public static unsafe void InitNativeLibraries()
         {
-            if (glfw3.GlfwInit() == 0)
-            {
-                string msg = "";
-                int code = glfw3.GlfwGetError(ref msg);
-                Throw("glfw", $"{msg} ({code})");
-            }
-
             stb_image.StbiSetFlipVerticallyOnLoad(1);
 
             if (bass.BASS_Init(-1, 44100, 0x4000, IntPtr.Zero, IntPtr.Zero) == 0)

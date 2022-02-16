@@ -1,6 +1,7 @@
 ﻿using Utubz.Graphics;
 using Utubz.Async;
 using Utubz.Physics;
+using Utubz.Internal.Platforms;
 using Utubz.Internal.Native;
 using Utubz.Internal.Native.Glad;
 using Utubz.Internal.Native.Glfw;
@@ -13,15 +14,23 @@ namespace Utubz.Internal
 {
     internal class ProcessLoop : Object
     {
-        internal static void Main(string[] args, bool multithreaded = false)
+        internal static void Main(string[] args, Platform platform = null, bool multithreaded = false)
         {
+            if (platform == null)
+                platform = Platform.Default;
+
+            Application.Platform = platform;
             Application.Main = new ProcessLoop(new DefaultEntryArgs(args), multithreaded);
             Application.Main.Start();
             Application.Main.Wait();
         }
 
-        internal static void Main(string[] args, Type type, bool multithreaded = false)
+        internal static void Main(string[] args, Type type, Platform platform = null, bool multithreaded = false)
         {
+            if (platform == null)
+                platform = Platform.Default;
+
+            Application.Platform = platform;
             Application.Main = new ProcessLoop(new DefaultEntryArgs(args), multithreaded);
             Application.Main.initScene = type;
             Application.Main.Start();
@@ -44,7 +53,26 @@ namespace Utubz.Internal
             }
         }
 
-        internal ConcurrentBag<Window> windows;
+        private class PlatformException : System.Exception
+        {
+            public PlatformException() : base($"{Application.Platform.GetType().Name}Exception: {Application.Platform.Error()}")
+            {
+            }
+
+            public PlatformException(Platform platform) : base($"{platform.GetType().Name}Exception: {platform.Error()}")
+            {
+            }
+
+            public PlatformException(Platform platform, string error) : base($"{platform.GetType().Name}Exception: {error}")
+            {
+            }
+
+            public PlatformException(string error) : base($"PlatformException: {error}")
+            {
+            }
+        }
+
+        internal ConcurrentDictionary<int, Window> windows;
 
         public IEntryArgs Args { get; }
         public Thread MainThread { get; }
@@ -60,10 +88,12 @@ namespace Utubz.Internal
 
         private void Init()
         {
+            if (Application.Platform.Init())
+                throw new PlatformException();
             NativeUtil.InitNativeLibraries();
             Garbage.Init();
             Phy2D.Init();
-
+            
             Window.Create("cool", 0, 0, 1280, 720, false, initScene);
 
             if (Multithreaded)
@@ -76,6 +106,7 @@ namespace Utubz.Internal
             Phy2D.Quit();
             Garbage.Quit();
             NativeUtil.QuitNativeLibraries();
+            Application.Platform.Quit();
 
             Debug.Save();
         }
@@ -84,7 +115,7 @@ namespace Utubz.Internal
         {
             while (!pollingEvents) ;
             pollingEvents = true;
-            glfw3.GlfwPollEvents();
+            Application.Platform.Poll();
             pollingEvents = false;
             while (needsRefresh) ;
         }
@@ -112,7 +143,7 @@ namespace Utubz.Internal
             {
                 Poll();
 
-                foreach (Window win in windows)
+                foreach (Window win in windows.Values)
                 {
                     try
                     {
@@ -142,7 +173,7 @@ namespace Utubz.Internal
                 pollingEvents = true;
                 while (pollingEvents) ;
 
-                foreach (Window win in windows)
+                foreach (Window win in windows.Values)
                 {
                     try
                     {
@@ -178,7 +209,6 @@ namespace Utubz.Internal
 
             while (!QueueStop)
             {
-                glfw3.GlfwPollEvents();
                 UpdateAndRenderAll();
             }
 
@@ -196,11 +226,12 @@ namespace Utubz.Internal
 
         private void UpdateAndRenderAll()
         {
+            Application.Platform.Poll();
             Utubz.Discord.Status.Run();
 
             try
             {
-                foreach (Window win in windows)
+                foreach (Window win in windows.Values)
                 {
                     win.Update();
                     win.Render();
@@ -237,16 +268,11 @@ namespace Utubz.Internal
             throw new ProcessLoopStopImmediateException();
         }
 
-        private void GlfwOnError(int code, string msg)
-        {
-            Debug.Log(new GlfwErrorException(code, msg));
-        }
-
         internal ProcessLoop(IEntryArgs args, bool multithreaded = false)
         {
             Args = args;
             QueueStop = false;
-            windows = new ConcurrentBag<Window>();
+            windows = new ConcurrentDictionary<int, Window>();
 
             Multithreaded = multithreaded;
 
@@ -264,8 +290,6 @@ namespace Utubz.Internal
 
             Time.asyncCtx = new TimeContext();
             Input.asyncCtx = new InputContext((int)Key.Max);
-
-            glfw3.GlfwSetErrorCallback(GlfwOnError);
         }
     }
 }

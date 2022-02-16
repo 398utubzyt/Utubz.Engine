@@ -11,8 +11,4 @@
     <None Remove="**\README.md" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Internal\Native\Sdl2\" />
-  </ItemGroup>
-
 </Project>

@@ -24,6 +24,10 @@ namespace Utubz
         #region Properties
 
         /// <summary>
+        /// Not the native pointer to the <see cref="Window"/> (like HWND on Windows), but an internal one used by the <see cref="Internal.Platforms.Platform"/>.
+        /// </summary>
+        public abstract IntPtr Pointer { get; }
+        /// <summary>
         /// The title of the <see cref="Window"/>.
         /// </summary>
         public abstract string Title { get; set; }
@@ -211,7 +215,7 @@ namespace Utubz
 
             view = new Viewport(0, 0, Width, Height);
 
-            Application.Main.windows.Add(this);
+            Application.Main.windows.TryAdd(platform.GetWindowId(this), this);
 
             Initialize(title, x, y, width, height, vsync);
 

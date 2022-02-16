@@ -7,14 +7,22 @@ namespace Utubz.Discord
         private static Internal.Discord.Discord ctx;
         private static Activity act;
         private static bool init;
+        private static bool attempt;
 
         public static void Initialize(long application)
         {
-            if (init)
+            if (attempt)
                 return;
-            
-            init = true;
-            ctx = new Internal.Discord.Discord(application, 1);
+
+            attempt = true;
+            try
+            {
+                ctx = new Internal.Discord.Discord(application, 1);
+                init = true;
+            } catch (ResultException)
+            {
+                init = false;
+            }
         }
 
         internal static void Quit()
@@ -36,6 +44,9 @@ namespace Utubz.Discord
 
         private static void UpdateActivity()
         {
+            if (!init)
+                return;
+
             ctx.GetActivityManager().UpdateActivity(act, Check);
         }
 
